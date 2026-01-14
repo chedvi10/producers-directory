@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Producer {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String   @unique
+  phone        String
+  passwordHash String
+  subscription Subscription?
+  programs     Program[]
+  createdAt    DateTime @default(now())
+}
+
+model Program {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  category    String
+  targetAge   String
+  duration    String
+  location    String
+  price       Float?
+  tags        String[]
+  producerId  String   @db.ObjectId
+  producer    Producer @relation(fields: [producerId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Subscription {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  startDate     DateTime @default(now())
+  expiryDate    DateTime
+  status        String   @default("active") // active / expired / paused
+  reminderSent  Boolean  @default(false)
+  producerId    String   @unique @db.ObjectId
+  producer      Producer @relation(fields: [producerId], references: [id])
+}
+
