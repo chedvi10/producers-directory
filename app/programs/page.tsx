@@ -40,12 +40,12 @@ export default function ProgramsPage() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-6 text-center">מדריך תוכניות</h1>
+        <h1 className="text-4xl font-bold mb-6 text-gray-600 text-center">מדריך תוכניות</h1>
         
         <ProgramFilters onFilterChange={updateFilter} />
 
         {loading ? (
-          <div className="text-center py-12">טוען...</div>
+          <div className="text-center py-12 text-gray-500">טוען...</div>
         ) : (
           <div className="bg-white rounded-lg shadow">
             {programs.map((program, index) => (

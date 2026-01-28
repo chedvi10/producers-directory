@@ -42,7 +42,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-center mb-6">התחברות מפיקות</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-600 mb-6">התחברות מפיקות</h1>
         
         {error && (
           <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-center">
@@ -51,27 +51,34 @@ export default function LoginPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">אימייל</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-              required
-            />
-          </div>
+<div>
+  <label htmlFor="email" className="block text-sm font-medium text-gray-500 mb-2">
+    אימייל
+  </label>
+  <input
+    id="email"
+    type="email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+    required
+  />
+</div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">סיסמה</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-              required
-            />
-          </div>
+<div>
+  <label htmlFor="password" className="block text-sm font-medium text-gray-500 mb-2">
+    סיסמה
+  </label>
+  <input
+    id="password"
+    type="password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+    required
+  />
+</div>
+
 
           <button
             type="submit"

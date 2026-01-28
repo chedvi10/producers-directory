@@ -1,36 +1,174 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📚 מדריך תוכניות
 
-## Getting Started
+> **אלפון דיגיטלי מתקדם לתוכניות, מרצים והפקות לאירועים**
 
-First, run the development server:
+[![Status](https://img.shields.io/badge/Status-In%20Development-yellow?style=for-the-badge)]()
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)]()
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)]()
+
+---
+
+## 🎯 אודות הפרויקט
+
+**מדריך תוכניות** הוא פלטפורמה דיגיטלית חדשנית המשמשת כאלפון מרכזי ומקיף לרכזות ומפיקות אירועים. 
+
+המערכת מאפשרת למפיקות להעלות ולנהל את התוכניות שלהן תמורת מנוי חודשי סמלי, ולרכזות לחפש, לסנן ולמצוא את התוכנית המושלמת לאירוע שלהן בקלות ובמהירות.
+
+> ⚠️ **הפרויקט נמצא כעת בשלבי פיתוח פעיל**
+
+---
+
+## ✨ תכונות עיקריות
+
+### 👩‍💼 למפיקות ובעלי עסקים
+
+- 📝 **העלאת תוכניות** - הוספת תוכניות עם כל הפרטים הרלוונטיים
+- 🎬 **דוגמאות (Demo)** - העלאת תמונות וסרטונים להמחשת התוכנית
+- 💳 **מנוי חודשי** - תשלום סמלי לחשיפה מקסימלית
+- 📊 **דשבורד מתקדם** - ניהול מלא של כל התוכניות במקום אחד
+- ✏️ **עריכה בזמן אמת** - עדכון פרטים בכל עת
+
+### 👩‍🏫 לרכזות ומחפשי תוכניות
+
+- 🔍 **חיפוש חכם AI** - מנוע חיפוש מבוסס בינה מלאכותית
+- 🎯 **סינון מתקדם** - סינון לפי:
+  - קטגוריה (תוכניות, הרצאות, אטרקציות, מסעדות, מדריכות טיולים)
+  - גיל מטרה
+  - מיקום גיאוגרפי
+  - טווח מחירים
+- 📋 **צפייה מלאה בפרטי התוכנית** - כל המידע במקום אחד:
+  - תיאור מפורט של התוכנית
+  - גיל מטרה ומשך התוכנית
+  - מיקום ומחיר
+  - דוגמאות ותמונות
+  - פרטי המפיקה (שם וטלפון) ליצירת קשר ישירה
+- 💰 **גישה במחיר נמוך** - אלפון מקיף בעלות סמלית
+- 📱 **זמין תמיד** - גישה 24/7 מכל מכשיר
+
+---
+
+## 🛠️ טכנולוגיות מתקדמות
+
+### Frontend
+- **Next.js 16** - React Framework עם App Router
+- **React 19** - ספריית UI מודרנית
+- **TypeScript 5** - פיתוח מאובטח עם טיפוסים סטטיים
+- **Tailwind CSS 4** - עיצוב רספונסיבי ומודרני
+
+### Backend
+- **Next.js API Routes** - RESTful API
+- **Prisma ORM 6** - ניהול מסד נתונים מתקדם
+- **MongoDB Atlas** - מסד נתונים ענן מהיר ואמין
+- **bcryptjs** - הצפנת סיסמאות ברמה גבוהה
+
+### כלים נוספים
+- **Lucide React** - אייקונים מודרניים
+- **ESLint** - בדיקת איכות קוד
+
+---
+
+## 🚀 התקנה והרצה
+
+### דרישות מקדימות
+- Node.js 20.0.0 ומעלה
+- npm / yarn / pnpm
+- חשבון MongoDB Atlas (חינם)
+
+### התקנה מהירה
 
 ```bash
+# 1. התקנת תלויות
+npm install
+
+# 2. הגדרת משתני סביבה (צור קובץ .env)
+DATABASE_URL="mongodb+srv://username:password@cluster.mongodb.net/producers-directory"
+
+# 3. הגדרת מסד נתונים
+npx prisma generate
+npx prisma db push
+
+# 4. הרצת הפרויקט
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🎉 **פתח את הדפדפן ב-[http://localhost:3000](http://localhost:3000)**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📁 מבנה הפרויקט
 
-## Learn More
+```
+producers-directory/
+├── app/                    # Next.js App Router
+│   ├── api/               # API Routes
+│   ├── dashboard/         # ניהול מפיקות
+│   ├── login/             # התחברות
+│   ├── register/          # רישום
+│   └── programs/          # אלפון תוכניות
+├── components/            # קומפוננטות React
+│   ├── dashboard/         # קומפוננטות דשבורד
+│   └── programs/          # קומפוננטות תוכניות
+├── lib/                   # פונקציות עזר
+├── prisma/                # סכמת מסד נתונים
+└── types/                 # TypeScript Types
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📦 סקריפטים זמינים
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run dev      # הרצת שרת פיתוח
+npm run build    # בניית פרודקשן
+npm run start    # הרצת פרודקשן
+npm run lint     # בדיקת קוד
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🎨 תכונות עיצוב
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+✅ **ממשק עברית מלא** - תמיכה ב-RTL  
+✅ **רספונסיבי** - עובד מצוין על כל המכשירים  
+✅ **נגיש** - עיצוב נגיש לכולם  
+✅ **מודרני** - עיצוב נקי ואינטואיטיבי
+
+---
+
+## 🔐 אבטחה
+
+✅ הצפנת סיסמאות עם bcrypt  
+✅ אימות משתמשים  
+✅ הגנה מפני SQL Injection  
+✅ HTTPS בפרודקשן
+
+---
+
+## 📈 Roadmap
+
+### שלב 1 - בפיתוח כעת ⚙️
+- מערכת רישום והתחברות
+- העלאת תוכניות
+- חיפוש וסינון בסיסי
+- העלאת דוגמאות (תמונות/וידאו)
+- מערכת תשלומים
+
+### שלב 2 - עתידי 🚀
+- חיפוש AI מתקדם
+- מערכת דירוגים וביקורות
+- אנליטיקס למפיקות
+- אפליקציית מובייל
+
+---
+
+## 📞 יצירת קשר
+
+לשאלות, הצעות או תמיכה:
+
+📧 **Email:** [support@madrich-tochniot.co.il](mailto:support@madrich-tochniot.co.il)
+
+---
+
+## 📄 רישיון
+
+© 2026 מדריך תוכניות. כל הזכויות שמורות.

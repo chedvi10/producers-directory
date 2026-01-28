@@ -21,8 +21,10 @@ export interface DashboardProgram {
   description: string;
   category: string;
   targetAge: string;
+  duration?: string;
   location: string;
   price: number | null;
+  tags?: string[];
   createdAt: string;
 }
 
