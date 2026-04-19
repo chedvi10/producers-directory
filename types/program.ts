@@ -8,6 +8,8 @@ export interface Program {
   location: string;
   price: number | null;
   tags?: string[];
+  images?: string[];  // 👈 חדש
+  videos?: string[];  // 👈 חדש
   createdAt?: string;
   producer: {
     name: string;
@@ -25,6 +27,8 @@ export interface DashboardProgram {
   location: string;
   price: number | null;
   tags?: string[];
+  images?: string[];  // 👈 חדש
+  videos?: string[];  // 👈 חדש
   createdAt: string;
 }
 

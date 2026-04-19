@@ -14,7 +14,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
+  useEffect(() => {//לבדוק שהוא תקין.
     const producerId = localStorage.getItem('producerId');
     if (!producerId) {
       router.push('/login');

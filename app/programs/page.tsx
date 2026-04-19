@@ -54,7 +54,7 @@ export default function ProgramsPage() {
                 className={`p-4 hover:bg-gray-50 cursor-pointer transition ${
                   index !== programs.length - 1 ? 'border-b' : ''
                 }`}
-                onClick={() => setSelected(program)}
+                onClick={() => setSelected(program)}//selectedPage
               >
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold text-gray-900 hover:text-orange-500">

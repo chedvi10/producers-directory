@@ -35,6 +35,8 @@ model Program {
   location    String
   price       Float?
   tags        String[]
+  images      String[] @default([])  // 👈 חדש - מערך של קישורים לתמונות
+  videos      String[] @default([])  // 👈 חדש - מערך של קישורים לוידאו
   producerId  String   @db.ObjectId
   producer    Producer @relation(fields: [producerId], references: [id])
   createdAt   DateTime @default(now())

@@ -129,4 +129,59 @@ describe('LoginPage', () => {
       expect(screen.getByText('שגיאה בהתחברות')).toBeInTheDocument();
     });
   });
+
+  it('לא שולח טופס עם שדות רקים', async () => {
+    render(<LoginPage />);
+    
+    const submitButton = screen.getByRole('button', { name: 'התחבר' });
+    fireEvent.click(submitButton);
+    
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('מבטל כפתור בזמן טעינה', async () => {
+    (global.fetch as jest.Mock).mockImplementation(() => 
+      new Promise(resolve => setTimeout(() => resolve({
+        ok: true,
+        json: async () => ({ producerId: '123' })
+      }), 100))
+    );
+
+    render(<LoginPage />);
+    
+    const emailInput = screen.getByLabelText('אימייל');
+    const passwordInput = screen.getByLabelText('סיסמה');
+    const submitButton = screen.getByRole('button', { name: 'התחבר' });
+    
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(submitButton);
+    
+    expect(submitButton).toBeDisabled();
+  });
+
+  it('שולח את הנתונים הנכונים ל-API', async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ producerId: '123' }),
+    });
+
+    render(<LoginPage />);
+    
+    const emailInput = screen.getByLabelText('אימייל');
+    const passwordInput = screen.getByLabelText('סיסמה');
+    const submitButton = screen.getByRole('button', { name: 'התחבר' });
+    
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'mypassword' } });
+    fireEvent.click(submitButton);
+    
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'test@example.com', password: 'mypassword' }),
+      });
+    });
+  });
 });

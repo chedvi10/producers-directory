@@ -3,13 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, X, Image as ImageIcon, Video } from 'lucide-react';
+import { CldUploadWidget } from 'next-cloudinary';
 
 export default function EditProgramPage() {
   const router = useRouter();
   const params = useParams();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [images, setImages] = useState<string[]>([]);
+  const [videos, setVideos] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -47,6 +50,8 @@ export default function EditProgramPage() {
           price: program.price?.toString() || '',
           tags: program.tags?.join(', ') || '',
         });
+        setImages(program.images || []);
+        setVideos(program.videos || []);
       }
       setFetching(false);
     } catch (error) {
@@ -64,6 +69,8 @@ export default function EditProgramPage() {
       ...formData,
       price: formData.price ? parseFloat(formData.price) : null,
       tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+      images,
+      videos,
     };
 
     await fetch('/api/dashboard', {
@@ -77,6 +84,14 @@ export default function EditProgramPage() {
 
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const removeImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  const removeVideo = (index: number) => {
+    setVideos(videos.filter((_, i) => i !== index));
   };
 
   if (fetching) {
@@ -116,6 +131,100 @@ export default function EditProgramPage() {
                 className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
                 required
               />
+            </div>
+
+            {/* העלאת תמונות */}
+            <div>
+              <label className="block font-medium mb-2">תמונות דוגמה</label>
+              <CldUploadWidget
+                uploadPreset="producers_upload"
+                onSuccess={(result: any) => {
+                  setImages([...images, result.info.secure_url]);
+                }}
+                options={{
+                  maxFiles: 5,
+                  resourceType: 'image',
+                  clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                  maxFileSize: 5000000,
+                }}
+              >
+                {({ open }) => (
+                  <button
+                    type="button"
+                    onClick={() => open()}
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition"
+                  >
+                    <ImageIcon className="h-5 w-5" />
+                    העלאת תמונות
+                  </button>
+                )}
+              </CldUploadWidget>
+
+              {images.length > 0 && (
+                <div className="grid grid-cols-3 gap-4 mt-4">
+                  {images.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`תמונה ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* העלאת וידאו */}
+            <div>
+              <label className="block font-medium mb-2">סרטוני דוגמה</label>
+              <CldUploadWidget
+                uploadPreset="producers_upload"
+                onSuccess={(result: any) => {
+                  setVideos([...videos, result.info.secure_url]);
+                }}
+                options={{
+                  maxFiles: 3,
+                  resourceType: 'video',
+                  clientAllowedFormats: ['mp4', 'mov', 'avi', 'webm'],
+                  maxFileSize: 50000000,
+                }}
+              >
+                {({ open }) => (
+                  <button
+                    type="button"
+                    onClick={() => open()}
+                    className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition"
+                  >
+                    <Video className="h-5 w-5" />
+                    העלאת וידאו
+                  </button>
+                )}
+              </CldUploadWidget>
+
+              {videos.length > 0 && (
+                <div className="space-y-2 mt-4">
+                  {videos.map((url, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <span className="text-sm">וידאו {index + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeVideo(index)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

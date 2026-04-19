@@ -52,7 +52,7 @@ export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const programId = searchParams.get('programId');
 
-  await prisma.program.delete({
+  await prisma.program.delete({//לדאוג שלא תיהיה שגיאה.
     where: { id: programId! },
   });
 

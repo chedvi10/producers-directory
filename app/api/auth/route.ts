@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'אימייל או סיסמה שגויים' }, { status: 401 });
     }
 
-    const isValid = await bcrypt.compare(password, producer.passwordHash);
+    const isValid = await bcrypt.compare(password, producer.passwordHash);//שיהיה ברור
 
     if (!isValid) {
       return NextResponse.json({ error: 'אימייל או סיסמה שגויים' }, { status: 401 });
