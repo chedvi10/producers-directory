@@ -32,7 +32,13 @@ export default function LoginPage() {
       }
 
       localStorage.setItem('producerId', data.producerId);
-      router.push('/dashboard');
+      
+      // 👈 בדיקה: אם זו מנהלת - העבר לדף ניהול, אחרת לדשבורד רגיל
+      if (data.isAdmin) {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (err) {
       setError('שגיאה בהתחברות');
       setLoading(false);

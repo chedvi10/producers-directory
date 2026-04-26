@@ -20,6 +20,7 @@ model Producer {
   email        String   @unique
   phone        String
   passwordHash String
+  isAdmin      Boolean  @default(false)
   subscription Subscription?
   programs     Program[]
   createdAt    DateTime @default(now())
@@ -37,9 +38,11 @@ model Program {
   tags        String[]
   images      String[] @default([])  // 👈 חדש - מערך של קישורים לתמונות
   videos      String[] @default([])  // 👈 חדש - מערך של קישורים לוידאו
+  status      String   @default("pending")
   producerId  String   @db.ObjectId
   producer    Producer @relation(fields: [producerId], references: [id])
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Subscription {

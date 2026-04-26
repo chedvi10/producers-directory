@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'אימייל או סיסמה שגויים' }, { status: 401 });
     }
 
-    const isValid = await bcrypt.compare(password, producer.passwordHash);//שיהיה ברור
+    const isValid = await bcrypt.compare(password, producer.passwordHash);
 
     if (!isValid) {
       return NextResponse.json({ error: 'אימייל או סיסמה שגויים' }, { status: 401 });
@@ -22,7 +22,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ 
       producerId: producer.id,
-      name: producer.name 
+      name: producer.name,
+      isAdmin: producer.isAdmin  // 👈 הוסיפי את השורה הזו
     });
   } catch (error) {
     return NextResponse.json({ error: 'שגיאה בשרת' }, { status: 500 });

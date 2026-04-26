@@ -1,6 +1,6 @@
 'use client';
 
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Clock, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { DashboardProgram } from '@/types/program';
 
@@ -17,6 +17,28 @@ export function ProgramCard({ program, onDelete }: ProgramCardProps) {
         <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
           {program.category}
         </span>
+      </div>
+
+      {/* 👈 הוספנו את הסטטוס כאן */}
+      <div className="mb-3">
+        {program.status === 'approved' && (
+          <span className="inline-flex items-center gap-1 bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full font-semibold">
+            <CheckCircle className="h-4 w-4" />
+            מאושר - התוכנית מוצגת לרכזות
+          </span>
+        )}
+        {program.status === 'pending' && (
+          <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-sm px-3 py-1 rounded-full font-semibold">
+            <Clock className="h-4 w-4" />
+            ממתין לאישור מנהלת
+          </span>
+        )}
+        {program.status === 'rejected' && (
+          <span className="inline-flex items-center gap-1 bg-red-100 text-red-800 text-sm px-3 py-1 rounded-full font-semibold">
+            <XCircle className="h-4 w-4" />
+            נדחה - יש לערוך ולשלוח שוב
+          </span>
+        )}
       </div>
       
       <p className="text-gray-600 mb-4 line-clamp-2">{program.description}</p>
