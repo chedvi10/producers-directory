@@ -1,96 +1,102 @@
 import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { validateAuth } from '@/lib/auth';
 import { sendProgramApprovedEmail, sendProgramRejectedEmail } from '@/lib/email';
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const adminId = searchParams.get('adminId');
+export async function GET(request: NextRequest) {
+  try {
+    const { producerId } = validateAuth(request);
 
-  if (!adminId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+    // בדיקה שזו באמת מנהלת
+    const admin = await prisma.producer.findUnique({
+      where: { id: producerId },
+    });
 
-  // בדיקה שזו באמת מנהלת
-  const admin = await prisma.producer.findUnique({
-    where: { id: adminId },
-  });
+    if (!admin?.isAdmin) {
+      return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
+    }
 
-  if (!admin?.isAdmin) {
-    return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
-  }
-
-  // שליפת כל התוכניות עם פרטי המפיקה
-  const programs = await prisma.program.findMany({
-    include: { 
-      producer: { 
-        select: { 
-          name: true, 
-          phone: true, 
-          email: true 
+    // שליפת כל התוכניות עם פרטי המפיקה
+    const programs = await prisma.program.findMany({
+      include: { 
+        producer: { 
+          select: { 
+            name: true, 
+            phone: true, 
+            email: true 
+          } 
         } 
-      } 
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+      },
+      orderBy: { createdAt: 'desc' },
+    });
 
-  return NextResponse.json(programs);
-}
-
-export async function PUT(request: Request) {
-  const { programId, status, adminId } = await request.json();
-
-  if (!adminId) {
+    return NextResponse.json(programs);
+  } catch (error) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  // בדיקה שזו באמת מנהלת
-  const admin = await prisma.producer.findUnique({
-    where: { id: adminId },
-  });
-
-  if (!admin?.isAdmin) {
-    return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
-  }
-
-  // עדכון סטטוס התוכנית
-  const program = await prisma.program.update({
-    where: { id: programId },
-    data: { status },
-    include: { producer: true }  // 👈 כדי לקבל את פרטי המפיקה
-  });
-
-  // 👈 שליחת מייל למפיקה לפי הסטטוס
-  if (status === 'approved') {
-    await sendProgramApprovedEmail(program.producer.email, program.producer.name, program.title);
-  } else if (status === 'rejected') {
-    await sendProgramRejectedEmail(program.producer.email, program.producer.name, program.title);
-  }
-
-  return NextResponse.json(program);
 }
 
-export async function DELETE(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const programId = searchParams.get('programId');
-  const adminId = searchParams.get('adminId');
+export async function PUT(request: NextRequest) {
+  try {
+    const { producerId } = validateAuth(request);
+    const { programId, status } = await request.json();
 
-  if (!adminId) {
+    // בדיקה שזו באמת מנהלת
+    const admin = await prisma.producer.findUnique({
+      where: { id: producerId },
+    });
+
+    if (!admin?.isAdmin) {
+      return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
+    }
+
+    // עדכון סטטוס התוכנית
+    const program = await prisma.program.update({
+      where: { id: programId },
+      data: { status },
+      include: { producer: true }
+    });
+
+    // שליחת מייל למפיקה לפי הסטטוס
+    if (status === 'approved') {
+      await sendProgramApprovedEmail(program.producer.email, program.producer.name, program.title);
+    } else if (status === 'rejected') {
+      await sendProgramRejectedEmail(program.producer.email, program.producer.name, program.title);
+    }
+
+    return NextResponse.json(program);
+  } catch (error) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+}
 
-  // בדיקה שזו באמת מנהלת
-  const admin = await prisma.producer.findUnique({
-    where: { id: adminId! },
-  });
+export async function DELETE(request: NextRequest) {
+  try {
+    const { producerId } = validateAuth(request);
+    const { searchParams } = new URL(request.url);
+    const programId = searchParams.get('programId');
 
-  if (!admin?.isAdmin) {
-    return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
+    if (!programId) {
+      return NextResponse.json({ error: 'Program ID required' }, { status: 400 });
+    }
+
+    // בדיקה שזו באמת מנהלת
+    const admin = await prisma.producer.findUnique({
+      where: { id: producerId },
+    });
+
+    if (!admin?.isAdmin) {
+      return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
+    }
+
+    // מחיקת התוכנית
+    await prisma.program.delete({
+      where: { id: programId },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  // מחיקת התוכנית
-  await prisma.program.delete({
-    where: { id: programId! },
-  });
-
-  return NextResponse.json({ success: true });
 }

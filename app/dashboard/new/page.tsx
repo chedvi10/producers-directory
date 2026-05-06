@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, Upload, X, Image as ImageIcon, Video } from 'lucide-react';
+import { ArrowRight, X, Image as ImageIcon, Video, Sparkles, Loader2, Save } from 'lucide-react';
 import { CldUploadWidget } from 'next-cloudinary';
+import { getAuthToken } from '@/lib/auth';
 
 export default function NewProgramPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
   const [formData, setFormData] = useState({
@@ -19,31 +21,58 @@ export default function NewProgramPage() {
     duration: '',
     location: '',
     price: '',
-    tags: '',
+    phone: '',
+    email: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
-    const producerId = localStorage.getItem('producerId');
-    
-    const data = {
-      ...formData,
-      price: formData.price ? parseFloat(formData.price) : null,
-      tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
-      images,
-      videos,
-      producerId,
-    };
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+      
+      const data = {
+        ...formData,
+        price: formData.price ? parseFloat(formData.price) : 0,
+        images,
+        videos
+      };
 
-    await fetch('/api/dashboard', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
+      const res = await fetch('/api/dashboard', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
 
-    router.push('/dashboard');
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const textResponse = await res.text();
+        console.error('Non-JSON response:', textResponse);
+        throw new Error('השרת החזיר תגובה לא תקינה');
+      }
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || 'שגיאה בשמירה');
+      }
+
+      alert('התוכנית נשמרה בהצלחה!');
+      router.push('/dashboard');
+    } catch (err: any) {
+      console.error('Error:', err);
+      setError(err.message || 'שגיאה בשמירת התוכנית');
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: any) => {
@@ -59,220 +88,279 @@ export default function NewProgramPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-3xl mx-auto">
-        <Link href="/dashboard" className="flex items-center gap-2 text-orange-500 hover:underline mb-6">
-          <ArrowRight className="h-4 w-4" />
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-white p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* כפתור חזרה */}
+        <Link 
+          href="/dashboard" 
+          className="inline-flex items-center gap-2 text-purple-600 hover:text-pink-600 font-medium mb-6 transition-colors"
+        >
+          <ArrowRight className="h-5 w-5" />
           חזרה לדשבורד
         </Link>
 
-        <div className="bg-white rounded-lg shadow p-8">
-          <h1 className="text-3xl font-bold mb-6">הוספת תוכנית חדשה</h1>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block font-medium mb-2">שם התוכנית *</label>
-              <input
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-                required
-              />
+        {/* כרטיס הטופס */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-8 text-white">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-white/20 p-3 rounded-xl">
+                <Sparkles className="h-8 w-8" />
+              </div>
+              <h1 className="text-4xl font-bold">הוספת תוכנית חדשה</h1>
             </div>
+            <p className="text-purple-100">מלאי את הפרטים והתוכנית שלך תעלה לאלפון</p>
+          </div>
 
-            <div>
-              <label className="block font-medium mb-2">תיאור *</label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={4}
-                className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-                required
-              />
-            </div>
+          {/* טופס */}
+          <div className="p-8">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl mb-6 flex items-center gap-2">
+                <X className="h-5 w-5" />
+                {error}
+              </div>
+            )}
 
-            {/* העלאת תמונות */}
-            <div>
-              <label className="block font-medium mb-2">תמונות דוגמה</label>
-              <CldUploadWidget
-                uploadPreset="producers_upload"
-                onSuccess={(result: any) => {
-                  setImages([...images, result.info.secure_url]);
-                }}
-                options={{
-                  maxFiles: 5,
-                  resourceType: 'image',
-                  clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                  maxFileSize: 5000000, // 5MB
-                }}
-              >
-                {({ open }) => (
-                  <button
-                    type="button"
-                    onClick={() => open()}
-                    className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition"
-                  >
-                    <ImageIcon className="h-5 w-5" />
-                    העלאת תמונות
-                  </button>
-                )}
-              </CldUploadWidget>
-
-              {images.length > 0 && (
-                <div className="grid grid-cols-3 gap-4 mt-4">
-                  {images.map((url, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={url}
-                        alt={`תמונה ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* העלאת וידאו */}
-            <div>
-              <label className="block font-medium mb-2">סרטוני דוגמה</label>
-              <CldUploadWidget
-                uploadPreset="producers_upload"
-                onSuccess={(result: any) => {
-                  setVideos([...videos, result.info.secure_url]);
-                }}
-                options={{
-                  maxFiles: 3,
-                  resourceType: 'video',
-                  clientAllowedFormats: ['mp4', 'mov', 'avi', 'webm'],
-                  maxFileSize: 50000000, // 50MB
-                }}
-              >
-                {({ open }) => (
-                  <button
-                    type="button"
-                    onClick={() => open()}
-                    className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition"
-                  >
-                    <Video className="h-5 w-5" />
-                    העלאת וידאו
-                  </button>
-                )}
-              </CldUploadWidget>
-
-              {videos.length > 0 && (
-                <div className="space-y-2 mt-4">
-                  {videos.map((url, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-sm">וידאו {index + 1}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeVideo(index)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* שם התוכנית */}
               <div>
-                <label className="block font-medium mb-2">קטגוריה *</label>
-                <select name="category" value={formData.category} onChange={handleChange} className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500" required>
-                  <option value="">בחרי קטגוריה</option>
-                  <option value="תוכניות">תוכניות</option>
-                  <option value="הרצאות">הרצאות</option>
-                  <option value="אטרקציות">אטרקציות</option>
-                  <option value="אתרי נופש">אתרי נופש</option>
-                  <option value="מסעדות">מסעדות</option>
-                  <option value="מדריכות טיולים">מדריכות טיולים</option>
-                </select>
+                <label className="block font-semibold text-gray-700 mb-2">שם התוכנית *</label>
+                <input
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="לדוגמה: תוכנית קסמים מרהיבה"
+                  required
+                />
               </div>
 
+              {/* תיאור */}
               <div>
-                <label className="block font-medium mb-2">גיל מטרה *</label>
-                <select
-                  name="targetAge"
-                  value={formData.targetAge}
+                <label className="block font-semibold text-gray-700 mb-2">תיאור מפורט *</label>
+                <textarea
+                  name="description"
+                  value={formData.description}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  rows={5}
+                  className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                  placeholder="תארי את התוכנית בפירוט..."
                   required
+                />
+              </div>
+
+              {/* תמונות */}
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6">
+                <label className="block font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <ImageIcon className="h-5 w-5 text-purple-600" />
+                  תמונות דוגמה
+                </label>
+                <CldUploadWidget
+                  uploadPreset="producers_upload"
+                  onSuccess={(result: any) => {
+                    setImages([...images, result.info.secure_url]);
+                  }}
+                  options={{
+                    maxFiles: 5,
+                    resourceType: 'image',
+                    clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                    maxFileSize: 5000000
+                  }}
                 >
-                  <option value="">בחרי גיל</option>
-                  <option value="3-6">3-6</option>
-                  <option value="7-12">7-12</option>
-                  <option value="13-18">13-18</option>
-                </select>
+                  {({ open }) => (
+                    <button
+                      type="button"
+                      onClick={() => open()}
+                      className="flex items-center gap-2 px-6 py-3 border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-500 hover:bg-purple-100 transition-all font-medium text-purple-700"
+                    >
+                      <ImageIcon className="h-5 w-5" />
+                      העלאת תמונות (עד 5)
+                    </button>
+                  )}
+                </CldUploadWidget>
+
+                {images.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                    {images.map((url, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={url}
+                          alt={`תמונה ${index + 1}`}
+                          className="w-full h-40 object-cover rounded-xl shadow-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 shadow-lg"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <div>
-                <label className="block font-medium mb-2">משך *</label>
-                <input
-                  name="duration"
-                  value={formData.duration}
-                  onChange={handleChange}
-                  placeholder="לדוגמה: שעה וחצי"
-                  className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  required
-                />
+              {/* וידאו */}
+              <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6">
+                <label className="block font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <Video className="h-5 w-5 text-pink-600" />
+                  סרטוני דוגמה
+                </label>
+                <CldUploadWidget
+                  uploadPreset="producers_upload"
+                  onSuccess={(result: any) => {
+                    setVideos([...videos, result.info.secure_url]);
+                  }}
+                  options={{
+                    maxFiles: 3,
+                    resourceType: 'video',
+                    clientAllowedFormats: ['mp4', 'mov', 'avi', 'webm'],
+                    maxFileSize: 50000000
+                  }}
+                >
+                  {({ open }) => (
+                    <button
+                      type="button"
+                      onClick={() => open()}
+                      className="flex items-center gap-2 px-6 py-3 border-2 border-dashed border-pink-300 rounded-xl hover:border-pink-500 hover:bg-pink-100 transition-all font-medium text-pink-700"
+                    >
+                      <Video className="h-5 w-5" />
+                      העלאת וידאו (עד 3)
+                    </button>
+                  )}
+                </CldUploadWidget>
+
+                {videos.length > 0 && (
+                  <div className="space-y-3 mt-4">
+                    {videos.map((url, index) => (
+                      <div key={index} className="flex items-center justify-between p-4 bg-white rounded-xl shadow">
+                        <span className="text-sm font-medium text-gray-700">וידאו {index + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeVideo(index)}
+                          className="text-red-500 hover:text-red-700 transition-colors"
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <div>
-                <label className="block font-medium mb-2">מיקום *</label>
-                <input
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  placeholder="לדוגמה: תל אביב"
-                  className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  required
-                />
+              {/* שדות נוספים */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-2">קטגוריה *</label>
+                  <select 
+                    name="category" 
+                    value={formData.category} 
+                    onChange={handleChange} 
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white transition-all" 
+                    required
+                  >
+                    <option value="">בחרי קטגוריה</option>
+                    <option value="programs">תוכניות</option>
+                    <option value="lectures">הרצאות</option>
+                    <option value="attractions">אטרקציות</option>
+                    <option value="restaurants">מסעדות</option>
+                    <option value="tours">מדריכות טיולים</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-2">גיל מטרה *</label>
+                  <input
+                    name="targetAge"
+                    value={formData.targetAge}
+                    onChange={handleChange}
+                    placeholder="לדוגמה: 7-12"
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-2">משך *</label>
+                  <input
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleChange}
+                    placeholder="לדוגמה: שעה וחצי"
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-2">מיקום *</label>
+                  <input
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="לדוגמה: תל אביב"
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-2">מחיר (₪)</label>
+                  <input
+                    name="price"
+                    type="number"
+                    value={formData.price}
+                    onChange={handleChange}
+                    placeholder="0"
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-2">טלפון</label>
+                  <input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="050-1234567"
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block font-semibold text-gray-700 mb-2">אימייל</label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="example@email.com"
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block font-medium mb-2">מחיר (₪)</label>
-                <input
-                  name="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={handleChange}
-                  placeholder="אופציונלי"
-                  className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-              </div>
-
-              <div>
-                <label className="block font-medium mb-2">תגיות (מופרדות בפסיק)</label>
-                <input
-                  name="tags"
-                  value={formData.tags}
-                  onChange={handleChange}
-                  placeholder="לדוגמה: כיף, למידה, יצירתיות"
-                  className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 disabled:opacity-50"
-            >
-              {loading ? 'שומר...' : 'שמור תוכנית'}
-            </button>
-          </form>
+              {/* כפתור שמירה */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                    <span>שומר...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-6 w-6" />
+                    <span>שמור תוכנית</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>

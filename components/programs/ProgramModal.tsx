@@ -1,9 +1,7 @@
 'use client';
 
-import { X, Users, MapPin, Clock, DollarSign, Phone, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
+import { X, Users, MapPin, Clock, DollarSign, Phone, Image as ImageIcon, Video as VideoIcon, Sparkles } from 'lucide-react';
 import { Program } from '@/types/program';
-import { CldImage, CldVideoPlayer } from 'next-cloudinary';
-import 'next-cloudinary/dist/cld-video-player.css';
 
 interface ProgramModalProps {
   program: Program;
@@ -12,30 +10,56 @@ interface ProgramModalProps {
 
 export function ProgramModal({ program, onClose }: ProgramModalProps) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">{program.title}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded">
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" 
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slideUp" 
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 flex justify-between items-start rounded-t-3xl z-10">
+          <div className="flex-1">
+            <h2 className="text-3xl font-bold mb-2">{program.title}</h2>
+            <p className="text-purple-100 flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              {program.producer?.name}
+            </p>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="p-2 hover:bg-white/20 rounded-full transition-colors"
+          >
             <X className="h-6 w-6" />
           </button>
         </div>
-        <div className="p-6 space-y-6">
+
+        <div className="p-8 space-y-8">
+          {/* תג קטגוריה */}
+          <div className="flex justify-center">
+            <span className="inline-block bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 px-6 py-2 rounded-full font-semibold text-sm">
+              {program.category}
+            </span>
+          </div>
+
           {/* תמונות */}
           {program.images && program.images.length > 0 && (
             <div>
-              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                <ImageIcon className="h-5 w-5" />
-                תמונות
+              <h3 className="font-bold text-xl mb-4 flex items-center gap-2 text-gray-800">
+                <ImageIcon className="h-6 w-6 text-purple-600" />
+                גלריית תמונות
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {program.images.map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`${program.title} - תמונה ${index + 1}`}
-                    className="w-full h-48 object-cover rounded-lg shadow hover:shadow-lg transition"
-                  />
+                  <div key={index} className="relative group overflow-hidden rounded-2xl shadow-lg">
+                    <img
+                      src={url}
+                      alt={`${program.title} - תמונה ${index + 1}`}
+                      className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -44,9 +68,9 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
           {/* וידאו */}
           {program.videos && program.videos.length > 0 && (
             <div>
-              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                <VideoIcon className="h-5 w-5" />
-                סרטונים
+              <h3 className="font-bold text-xl mb-4 flex items-center gap-2 text-gray-800">
+                <VideoIcon className="h-6 w-6 text-pink-600" />
+                סרטוני הדגמה
               </h3>
               <div className="space-y-4">
                 {program.videos.map((url, index) => (
@@ -54,7 +78,7 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
                     key={index}
                     src={url}
                     controls
-                    className="w-full rounded-lg shadow"
+                    className="w-full rounded-2xl shadow-lg"
                   >
                     הדפדפן שלך לא תומך בהצגת וידאו.
                   </video>
@@ -63,47 +87,82 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
             </div>
           )}
 
-          <div>
-            <h3 className="font-semibold text-lg mb-2">תיאור</h3>
-            <p className="text-gray-700">{program.description}</p>
+          {/* תיאור */}
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6">
+            <h3 className="font-bold text-xl mb-3 text-gray-800">תיאור התוכנית</h3>
+            <p className="text-gray-700 leading-relaxed">{program.description}</p>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-500">גיל מטרה</p>
-                <p className="font-medium">{program.targetAge}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-500">מיקום</p>
-                <p className="font-medium">{program.location}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-gray-500" />
-              <div>
-                <p className="text-sm text-gray-500">משך</p>
-                <p className="font-medium">{program.duration}</p>
-              </div>
-            </div>
-            {program.price && (
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-gray-500" />
+
+          {/* פרטים */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white border-2 border-purple-100 rounded-2xl p-5 hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="bg-purple-100 p-3 rounded-xl">
+                  <Users className="h-6 w-6 text-purple-600" />
+                </div>
                 <div>
-                  <p className="text-sm text-gray-500">מחיר</p>
-                  <p className="font-medium">₪{program.price}</p>
+                  <p className="text-sm text-gray-500 font-medium">גיל מטרה</p>
+                  <p className="font-bold text-gray-800 text-lg">{program.targetAge}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white border-2 border-pink-100 rounded-2xl p-5 hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="bg-pink-100 p-3 rounded-xl">
+                  <MapPin className="h-6 w-6 text-pink-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">מיקום</p>
+                  <p className="font-bold text-gray-800 text-lg">{program.location}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white border-2 border-purple-100 rounded-2xl p-5 hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="bg-purple-100 p-3 rounded-xl">
+                  <Clock className="h-6 w-6 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">משך התוכנית</p>
+                  <p className="font-bold text-gray-800 text-lg">{program.duration}</p>
+                </div>
+              </div>
+            </div>
+
+            {program.price && (
+              <div className="bg-white border-2 border-pink-100 rounded-2xl p-5 hover:shadow-lg transition-shadow">
+                <div className="flex items-center gap-3">
+                  <div className="bg-pink-100 p-3 rounded-xl">
+                    <DollarSign className="h-6 w-6 text-pink-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 font-medium">מחיר</p>
+                    <p className="font-bold text-gray-800 text-lg">₪{program.price}</p>
+                  </div>
                 </div>
               </div>
             )}
           </div>
-          <div>
-            <h3 className="font-semibold text-lg mb-2">יצירת קשר</h3>
-            <div className="flex items-center gap-2">
-              <Phone className="h-5 w-5 text-gray-500" />
-              <span>{program.producer.name} - {program.producer.phone}</span>
+
+          {/* יצירת קשר */}
+          <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-6 text-white">
+            <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
+              <Phone className="h-6 w-6" />
+              יצירת קשר
+            </h3>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-purple-100 text-sm mb-1">מפיקה</p>
+                <p className="font-bold text-lg">{program.producer?.name}</p>
+              </div>
+              <a 
+                href={`tel:${program.producer?.phone}`}
+                className="bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:shadow-lg hover:scale-105 transition-all"
+              >
+                {program.producer?.phone}
+              </a>
             </div>
           </div>
         </div>
