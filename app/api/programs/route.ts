@@ -20,7 +20,10 @@ export async function GET(request: Request) {
   if (targetAge) where.targetAge = targetAge;
 
   const location = searchParams.get('location');
-  if (location) where.location = location;
+  if (location) {
+    // 👈 שינוי: חיפוש חלקי במקום התאמה מדויקת
+    where.location = { contains: location, mode: 'insensitive' };
+  }
 
   const maxPrice = searchParams.get('maxPrice');
   if (maxPrice) where.price = { lte: parseFloat(maxPrice) };

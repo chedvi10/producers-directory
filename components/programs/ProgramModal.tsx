@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Users, MapPin, Clock, DollarSign, Phone, Image as ImageIcon, Video as VideoIcon, Sparkles } from 'lucide-react';
+import { X, Users, MapPin, Clock, DollarSign, Phone, Image as ImageIcon, Video as VideoIcon, Sparkles, Mail } from 'lucide-react';
 import { Program } from '@/types/program';
 
 interface ProgramModalProps {
@@ -9,6 +9,14 @@ interface ProgramModalProps {
 }
 
 export function ProgramModal({ program, onClose }: ProgramModalProps) {
+  // 👈 Debug זמני - תוכל למחוק אחר כך
+  console.log('Program data:', {
+    programPhone: program.phone,
+    producerPhone: program.producer?.phone,
+    programEmail: program.email,
+    producerEmail: program.producer?.email
+  });
+
   return (
     <div 
       className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" 
@@ -152,17 +160,35 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
               <Phone className="h-6 w-6" />
               יצירת קשר
             </h3>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm mb-1">מפיקה</p>
-                <p className="font-bold text-lg">{program.producer?.name}</p>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-100 text-sm mb-1">מפיקה</p>
+                  <p className="font-bold text-lg">{program.producer?.name}</p>
+                </div>
+                <a 
+                  href={`tel:${(program.phone && program.phone.trim() !== '') ? program.phone : program.producer?.phone}`}
+                  className="bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:shadow-lg hover:scale-105 transition-all"
+                >
+                  {(program.phone && program.phone.trim() !== '') ? program.phone : program.producer?.phone}
+                </a>
               </div>
-              <a 
-                href={`tel:${program.producer?.phone}`}
-                className="bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:shadow-lg hover:scale-105 transition-all"
-              >
-                {program.producer?.phone}
-              </a>
+              
+              {/* אימייל אם קיים */}
+              {((program.email && program.email.trim() !== '') || program.producer?.email) && (
+                <div className="flex items-center justify-between pt-2 border-t border-white/20">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-5 w-5 text-purple-100" />
+                    <span className="text-purple-100 text-sm">אימייל</span>
+                  </div>
+                  <a 
+                    href={`mailto:${(program.email && program.email.trim() !== '') ? program.email : program.producer?.email}`}
+                    className="bg-white/20 text-white px-4 py-2 rounded-full font-medium hover:bg-white/30 transition-all"
+                  >
+                    {(program.email && program.email.trim() !== '') ? program.email : program.producer?.email}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>

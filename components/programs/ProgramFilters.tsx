@@ -68,28 +68,26 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
                 onChange={(e) => onFilterChange('targetAge', e.target.value)}
               >
                 <option value="">כל הגילאים</option>
-                <option value="3-6">3-6</option>
-                <option value="6-12">6-12 בנים</option>
-                <option value="6-12">6-12 בנות</option>
-                <option value="13-18">12-16</option>
-                <option value="">17 ומעלה</option>
-                <option value="13-18">בנים בלבד</option>
+                <option value="בנים 3-6">בנים 3-6</option>
+                <option value="בנים 6-12">בנים 6-12</option>
+                <option value="בנים 12-18">בנים 12-18</option>
+                <option value="בנים 18+">בנים 18+</option>
+                <option value="בנות 3-6">בנות 3-6</option>
+                <option value="בנות 6-12">בנות 6-12</option>
+                <option value="בנות 12-18">בנות 12-18</option>
+                <option value="בנות 18+">בנות 18+</option>
               </select>
             </div>
 
-            {/* מיקום */}
+            {/* מיקום - שונה ל-input */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">מיקום</label>
-              <select 
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 bg-white transition-all"
+              <input
+                type="text"
+                placeholder="הכניסי עיר או אזור..."
+                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 placeholder-gray-400 transition-all"
                 onChange={(e) => onFilterChange('location', e.target.value)}
-              >
-                <option value="">כל האזורים</option>
-                <option value="תל אביב">תל אביב</option>
-                <option value="ירושלים">ירושלים</option>
-                <option value="חיפה">צפון</option>
-                <option value="דרום">דרום</option>
-              </select>
+              />
             </div>
 
             {/* מחיר */}

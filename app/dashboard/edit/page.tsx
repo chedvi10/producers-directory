@@ -65,8 +65,8 @@ export default function EditProgramPage() {
           duration: program.duration || '',
           location: program.location,
           price: program.price?.toString() || '',
-          phone: program.phone || data.producer.phone || '',
-          email: program.email || data.producer.email || ''
+          phone: program.phone || data.producer.phone || '', // 👈 עדיפות לטלפון של התוכנית, אחר כך של המפיקה
+          email: program.email || data.producer.email || ''   // 👈 עדיפות לאימייל של התוכנית, אחר כך של המפיקה
         });
         setImages(program.images || []);
         setVideos(program.videos || []);
@@ -120,12 +120,12 @@ export default function EditProgramPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const removeImage = () => {
-    setImages([]);
+  const removeImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
   };
 
-  const removeVideo = () => {
-    setVideos([]);
+  const removeVideo = (index: number) => {
+    setVideos(videos.filter((_, i) => i !== index));
   };
 
   if (fetching) {
@@ -201,19 +201,19 @@ export default function EditProgramPage() {
                 />
               </div>
 
-              {/* תמונה */}
+              {/* תמונות */}
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6">
                 <label className="block font-semibold text-gray-700 mb-3 flex items-center gap-2">
                   <ImageIcon className="h-5 w-5 text-purple-600" />
-                  תמונת דוגמה
+                  תמונות דוגמה
                 </label>
                 <CldUploadWidget
                   uploadPreset="producers_upload"
                   onSuccess={(result: any) => {
-                    setImages([result.info.secure_url]);
+                    setImages([...images, result.info.secure_url]);
                   }}
                   options={{
-                    maxFiles: 1,
+                    maxFiles: 5,
                     resourceType: 'image',
                     clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                     maxFileSize: 5000000
@@ -226,27 +226,29 @@ export default function EditProgramPage() {
                       className="flex items-center gap-2 px-6 py-3 border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-500 hover:bg-purple-100 transition-all font-medium text-purple-700"
                     >
                       <ImageIcon className="h-5 w-5" />
-                      העלאת תמונה
+                      העלאת תמונות (עד 5)
                     </button>
                   )}
                 </CldUploadWidget>
 
                 {images.length > 0 && (
-                  <div className="mt-4">
-                    <div className="relative group">
-                      <img
-                        src={images[0]}
-                        alt="תמונת התוכנית"
-                        className="w-full h-60 object-cover rounded-xl shadow-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeImage}
-                        className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 shadow-lg"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                    {images.map((url, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={url}
+                          alt={`תמונה ${index + 1}`}
+                          className="w-full h-40 object-cover rounded-xl shadow-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 shadow-lg"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -255,15 +257,15 @@ export default function EditProgramPage() {
               <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6">
                 <label className="block font-semibold text-gray-700 mb-3 flex items-center gap-2">
                   <Video className="h-5 w-5 text-pink-600" />
-                  סרטון דוגמה
+                  סרטוני דוגמה
                 </label>
                 <CldUploadWidget
                   uploadPreset="producers_upload"
                   onSuccess={(result: any) => {
-                    setVideos([result.info.secure_url]);
+                    setVideos([...videos, result.info.secure_url]);
                   }}
                   options={{
-                    maxFiles: 1,
+                    maxFiles: 3,
                     resourceType: 'video',
                     clientAllowedFormats: ['mp4', 'mov', 'avi', 'webm'],
                     maxFileSize: 50000000
@@ -276,23 +278,25 @@ export default function EditProgramPage() {
                       className="flex items-center gap-2 px-6 py-3 border-2 border-dashed border-pink-300 rounded-xl hover:border-pink-500 hover:bg-pink-100 transition-all font-medium text-pink-700"
                     >
                       <Video className="h-5 w-5" />
-                      העלאת וידאו
+                      העלאת וידאו (עד 3)
                     </button>
                   )}
                 </CldUploadWidget>
 
                 {videos.length > 0 && (
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow">
-                      <span className="text-sm font-medium text-gray-700">וידאו התוכנית</span>
-                      <button
-                        type="button"
-                        onClick={removeVideo}
-                        className="text-red-500 hover:text-red-700 transition-colors"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </div>
+                  <div className="space-y-3 mt-4">
+                    {videos.map((url, index) => (
+                      <div key={index} className="flex items-center justify-between p-4 bg-white rounded-xl shadow">
+                        <span className="text-sm font-medium text-gray-700">וידאו {index + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeVideo(index)}
+                          className="text-red-500 hover:text-red-700 transition-colors"
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -309,12 +313,11 @@ export default function EditProgramPage() {
                     required
                   >
                     <option value="">בחרי קטגוריה</option>
-                    <option value="תוכניות">תוכניות</option>
-                    <option value="הרצאות">הרצאות</option>
-                    <option value="אטרקציות">אטרקציות</option>
-                    <option value="אתרי נופש">אתרי נופש</option>
-                    <option value="מסעדות">מסעדות</option>
-                    <option value="מדריכות טיולים">מדריכות טיולים</option>
+                    <option value="programs">תוכניות</option>
+                    <option value="lectures">הרצאות</option>
+                    <option value="attractions">אטרקציות</option>
+                    <option value="restaurants">מסעדות</option>
+                    <option value="tours">מדריכות טיולים</option>
                   </select>
                 </div>
 
@@ -403,7 +406,7 @@ export default function EditProgramPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>

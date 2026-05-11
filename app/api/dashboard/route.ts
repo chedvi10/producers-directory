@@ -58,6 +58,8 @@ export async function POST(request: NextRequest) {
         duration: body.duration,
         location: body.location,
         price: body.price || 0,
+        phone: body.phone || null,     // 👈 הוסף - טלפון ספציפי לתוכנית
+        email: body.email || null,     // 👈 הוסף - אימייל ספציפי לתוכנית
         tags: body.tags || [],
         images: body.images || [],
         videos: body.videos || [],
@@ -69,7 +71,11 @@ export async function POST(request: NextRequest) {
     console.log('Program created:', program.id);
 
     if (producer.email) {
-      await sendProgramPendingEmail(producer.email, producer.name, program.title);
+      try {
+        await sendProgramPendingEmail(producer.email, producer.name, program.title);
+      } catch (emailError) {
+        console.log('שגיאה בשליחת מייל (התוכנית נשמרה):', emailError);
+      }
     }
 
     return NextResponse.json(program);
@@ -117,6 +123,8 @@ export async function PUT(request: NextRequest) {
         duration: updateData.duration,
         location: updateData.location,
         price: updateData.price || 0,
+        phone: updateData.phone || null,     // 👈 הוסף - טלפון ספציפי לתוכנית
+        email: updateData.email || null,     // 👈 הוסף - אימייל ספציפי לתוכנית
         images: updateData.images || [],
         videos: updateData.videos || [],
         status: 'pending'
@@ -127,7 +135,11 @@ export async function PUT(request: NextRequest) {
     console.log('Program updated:', program.id);
 
     if (program.producer.email) {
-      await sendProgramPendingEmail(program.producer.email, program.producer.name, program.title);
+      try {
+        await sendProgramPendingEmail(program.producer.email, program.producer.name, program.title);
+      } catch (emailError) {
+        console.log('שגיאה בשליחת מייל (התוכנית עודכנה):', emailError);
+      }
     }
 
     return NextResponse.json(program);

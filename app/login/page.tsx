@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Sparkles, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
+import { SearchCheck, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import { setAuthToken } from '@/lib/auth';
 
 export default function LoginPage() {
@@ -52,13 +52,12 @@ export default function LoginPage() {
         {/* כותרת */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6 group">
-            <Sparkles className="h-8 w-8 text-purple-600 group-hover:rotate-12 transition-transform" />
+            <SearchCheck className="h-8 w-8 text-purple-600 group-hover:rotate-12 transition-transform" />
             <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               מדריך תוכניות
             </span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">התחברות מפיקות</h1>
-          <p className="text-gray-600">ברוכה השבה! נשמח לראות אותך שוב</p>
         </div>
 
         {/* טופס */}
@@ -82,7 +81,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="your@email.com"
+                  placeholder=""
                   required
                 />
               </div>
@@ -100,7 +99,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="••••••••"
+                  placeholder=""
                   required
                 />
               </div>
@@ -109,7 +108,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <>

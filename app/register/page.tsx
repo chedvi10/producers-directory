@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Sparkles, User, Mail, Phone, Lock, Loader2, ArrowRight, CheckCircle } from 'lucide-react';
+import { SearchCheck, User, Mail, Phone, Lock, Loader2, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -71,7 +71,7 @@ export default function RegisterPage() {
         {/* כותרת */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6 group">
-            <Sparkles className="h-8 w-8 text-purple-600 group-hover:rotate-12 transition-transform" />
+            <SearchCheck className="h-8 w-8 text-purple-600 group-hover:rotate-12 transition-transform" />
             <span className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               מדריך תוכניות
             </span>
@@ -99,8 +99,8 @@ export default function RegisterPage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="שם מלא"
+                  className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900"
+                  placeholder=""
                   required
                 />
               </div>
@@ -117,8 +117,8 @@ export default function RegisterPage() {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="your@email.com"
+                  className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900"
+                  placeholder=""
                   required
                 />
               </div>
@@ -135,8 +135,8 @@ export default function RegisterPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="050-1234567"
-                  className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder=""
+                  className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900"
                   required
                 />
               </div>
@@ -153,7 +153,7 @@ export default function RegisterPage() {
                   type="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900"
                   placeholder="לפחות 6 תווים"
                   required
                 />
@@ -171,8 +171,8 @@ export default function RegisterPage() {
                   type="password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="הזן סיסמה שוב"
+                  className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900"
+                  placeholder=""
                   required
                 />
               </div>
@@ -181,7 +181,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <>

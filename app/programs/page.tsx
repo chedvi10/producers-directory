@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Sparkles, Search, Loader2 } from 'lucide-react';
+import { SearchCheck, Search, Loader2 } from 'lucide-react';
 import { ProgramFilters } from '@/components/programs/ProgramFilters';
 import { ProgramModal } from '@/components/programs/ProgramModal';
 import { Program } from '@/types/program';
@@ -30,7 +30,7 @@ export default function ProgramsPage() {
       <nav className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2 group">
-            <Sparkles className="h-6 w-6 text-purple-600 group-hover:rotate-12 transition-transform" />
+            <SearchCheck className="h-6 w-6 text-purple-600 group-hover:rotate-12 transition-transform" />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               מדריך תוכניות
             </h1>
@@ -82,11 +82,11 @@ export default function ProgramsPage() {
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors mb-1">
+                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors mb-2">
                       {program.title}
                     </h3>
-                    <p className="text-sm text-gray-500 mb-2">{program.producer?.name}</p>
-                    <p className="text-gray-600 line-clamp-2">{program.description}</p>
+                    <p className="text-gray-600 line-clamp-2 mb-2">{program.description}</p>
+                    <p className="text-sm text-gray-500">מפיקה: {program.producer?.name}</p>
                   </div>
                   <div className="mr-4">
                     <span className="inline-block bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-sm px-4 py-1.5 rounded-full font-medium">

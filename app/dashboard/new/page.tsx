@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, X, Image as ImageIcon, Video, Sparkles, Loader2, Save } from 'lucide-react';
@@ -24,6 +24,38 @@ export default function NewProgramPage() {
     phone: '',
     email: ''
   });
+
+  // מילוי אוטומטי של פרטי המפיקה
+  useEffect(() => {
+    const fetchProducerData = async () => {
+      try {
+        const token = getAuthToken();
+        if (!token) return;
+
+        const res = await fetch('/api/dashboard', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.producer) {
+            setFormData(prev => ({
+              ...prev,
+              phone: data.producer.phone || '',
+              email: data.producer.email || ''
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching producer data:', error);
+      }
+    };
+
+    fetchProducerData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,12 +111,12 @@ export default function NewProgramPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+  const removeImage = () => {
+    setImages([]);
   };
 
-  const removeVideo = (index: number) => {
-    setVideos(videos.filter((_, i) => i !== index));
+  const removeVideo = () => {
+    setVideos([]);
   };
 
   return (
@@ -129,8 +161,8 @@ export default function NewProgramPage() {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="לדוגמה: תוכנית קסמים מרהיבה"
+                  className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900"
+                  placeholder=""
                   required
                 />
               </div>
@@ -143,25 +175,25 @@ export default function NewProgramPage() {
                   value={formData.description}
                   onChange={handleChange}
                   rows={5}
-                  className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
+                  className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none text-gray-900"
                   placeholder="תארי את התוכנית בפירוט..."
                   required
                 />
               </div>
 
-              {/* תמונות */}
+              {/* תמונה */}
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6">
                 <label className="block font-semibold text-gray-700 mb-3 flex items-center gap-2">
                   <ImageIcon className="h-5 w-5 text-purple-600" />
-                  תמונות דוגמה
+                  תמונת דוגמה
                 </label>
                 <CldUploadWidget
                   uploadPreset="producers_upload"
                   onSuccess={(result: any) => {
-                    setImages([...images, result.info.secure_url]);
+                    setImages([result.info.secure_url]);
                   }}
                   options={{
-                    maxFiles: 5,
+                    maxFiles: 1,
                     resourceType: 'image',
                     clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                     maxFileSize: 5000000
@@ -174,29 +206,27 @@ export default function NewProgramPage() {
                       className="flex items-center gap-2 px-6 py-3 border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-500 hover:bg-purple-100 transition-all font-medium text-purple-700"
                     >
                       <ImageIcon className="h-5 w-5" />
-                      העלאת תמונות (עד 5)
+                      העלאת תמונה
                     </button>
                   )}
                 </CldUploadWidget>
 
                 {images.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                    {images.map((url, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={url}
-                          alt={`תמונה ${index + 1}`}
-                          className="w-full h-40 object-cover rounded-xl shadow-lg"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 shadow-lg"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ))}
+                  <div className="mt-4">
+                    <div className="relative group">
+                      <img
+                        src={images[0]}
+                        alt="תמונת התוכנית"
+                        className="w-full h-60 object-cover rounded-xl shadow-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 shadow-lg"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -205,15 +235,15 @@ export default function NewProgramPage() {
               <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6">
                 <label className="block font-semibold text-gray-700 mb-3 flex items-center gap-2">
                   <Video className="h-5 w-5 text-pink-600" />
-                  סרטוני דוגמה
+                  סרטון דוגמה
                 </label>
                 <CldUploadWidget
                   uploadPreset="producers_upload"
                   onSuccess={(result: any) => {
-                    setVideos([...videos, result.info.secure_url]);
+                    setVideos([result.info.secure_url]);
                   }}
                   options={{
-                    maxFiles: 3,
+                    maxFiles: 1,
                     resourceType: 'video',
                     clientAllowedFormats: ['mp4', 'mov', 'avi', 'webm'],
                     maxFileSize: 50000000
@@ -226,25 +256,23 @@ export default function NewProgramPage() {
                       className="flex items-center gap-2 px-6 py-3 border-2 border-dashed border-pink-300 rounded-xl hover:border-pink-500 hover:bg-pink-100 transition-all font-medium text-pink-700"
                     >
                       <Video className="h-5 w-5" />
-                      העלאת וידאו (עד 3)
+                      העלאת וידאו
                     </button>
                   )}
                 </CldUploadWidget>
 
                 {videos.length > 0 && (
-                  <div className="space-y-3 mt-4">
-                    {videos.map((url, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-white rounded-xl shadow">
-                        <span className="text-sm font-medium text-gray-700">וידאו {index + 1}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeVideo(index)}
-                          className="text-red-500 hover:text-red-700 transition-colors"
-                        >
-                          <X className="h-5 w-5" />
-                        </button>
-                      </div>
-                    ))}
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow">
+                      <span className="text-sm font-medium text-gray-700">וידאו התוכנית</span>
+                      <button
+                        type="button"
+                        onClick={removeVideo}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -257,28 +285,38 @@ export default function NewProgramPage() {
                     name="category" 
                     value={formData.category} 
                     onChange={handleChange} 
-                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white transition-all" 
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white transition-all text-gray-900" 
                     required
                   >
                     <option value="">בחרי קטגוריה</option>
-                    <option value="programs">תוכניות</option>
-                    <option value="lectures">הרצאות</option>
-                    <option value="attractions">אטרקציות</option>
-                    <option value="restaurants">מסעדות</option>
-                    <option value="tours">מדריכות טיולים</option>
+                    <option value="תוכניות">תוכניות</option>
+                    <option value="הרצאות">הרצאות</option>
+                    <option value="אטרקציות">אטרקציות</option>
+                    <option value="אתרי נופש">אתרי נופש</option>
+                    <option value="מסעדות">מסעדות</option>
+                    <option value="מדריכות טיולים">מדריכות טיולים</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block font-semibold text-gray-700 mb-2">גיל מטרה *</label>
-                  <input
-                    name="targetAge"
-                    value={formData.targetAge}
-                    onChange={handleChange}
-                    placeholder="לדוגמה: 7-12"
-                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  <select 
+                    name="targetAge" 
+                    value={formData.targetAge} 
+                    onChange={handleChange} 
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white transition-all text-gray-900" 
                     required
-                  />
+                  >
+                    <option value="">בחרי גיל מטרה</option>
+                    <option value="בנים 3-6">בנים 3-6</option>
+                    <option value="בנים 6-12">בנים 6-12</option>
+                    <option value="בנים 12-18">בנים 12-18</option>
+                    <option value="בנים 18+">בנים 18+</option>
+                    <option value="בנות 3-6">בנות 3-6</option>
+                    <option value="בנות 6-12">בנות 6-12</option>
+                    <option value="בנות 12-18">בנות 12-18</option>
+                    <option value="בנות 18+">בנות 18+</option>
+                  </select>
                 </div>
 
                 <div>
@@ -287,8 +325,8 @@ export default function NewProgramPage() {
                     name="duration"
                     value={formData.duration}
                     onChange={handleChange}
-                    placeholder="לדוגמה: שעה וחצי"
-                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    placeholder=""
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-gray-900"
                     required
                   />
                 </div>
@@ -299,8 +337,8 @@ export default function NewProgramPage() {
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
-                    placeholder="לדוגמה: תל אביב"
-                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    placeholder=""
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-gray-900"
                     required
                   />
                 </div>
@@ -313,30 +351,30 @@ export default function NewProgramPage() {
                     value={formData.price}
                     onChange={handleChange}
                     placeholder="0"
-                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-gray-900"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-2">טלפון</label>
+                  <label className="block font-semibold text-gray-700 mb-2">טלפון ליצירת קשר</label>
                   <input
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="050-1234567"
-                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    placeholder=""
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-gray-900"
                   />
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block font-semibold text-gray-700 mb-2">אימייל</label>
+                  <label className="block font-semibold text-gray-700 mb-2">אימייל ליצירת קשר</label>
                   <input
                     name="email"
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="example@email.com"
-                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    placeholder=""
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-gray-900"
                   />
                 </div>
               </div>
@@ -345,7 +383,7 @@ export default function NewProgramPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? (
                   <>

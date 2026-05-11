@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ProgramCard } from '@/components/dashboard/ProgramCard';
 import { SubscriptionStatus } from '@/components/dashboard/SubscriptionStatus';
 import { Producer, DashboardProgram } from '@/types/program';
-import { LogOut, Plus, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { LogOut, Plus, SearchCheck, Loader2, AlertCircle } from 'lucide-react';
 import { isAuthenticated, getAuthToken, clearAuth } from '@/lib/auth';
 
 export default function DashboardPage() {
@@ -121,7 +121,7 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-white" />
+              <SearchCheck className="h-5 w-5 text-white" />
             </div>
             <h1 className="text-xl font-bold text-gray-800">הדשבורד שלי</h1>
           </div>

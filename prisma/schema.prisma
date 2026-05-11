@@ -8,7 +8,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
@@ -35,9 +34,11 @@ model Program {
   duration    String
   location    String
   price       Float?
+  phone       String?  // 👈 הוסף - טלפון ספציפי לתוכנית
+  email       String?  // 👈 הוסף - אימייל ספציפי לתוכנית
   tags        String[]
-  images      String[] @default([])  // 👈 חדש - מערך של קישורים לתמונות
-  videos      String[] @default([])  // 👈 חדש - מערך של קישורים לוידאו
+  images      String[] @default([])
+  videos      String[] @default([])
   status      String   @default("pending")
   producerId  String   @db.ObjectId
   producer    Producer @relation(fields: [producerId], references: [id])
@@ -54,4 +55,3 @@ model Subscription {
   producerId    String   @unique @db.ObjectId
   producer      Producer @relation(fields: [producerId], references: [id])
 }
-

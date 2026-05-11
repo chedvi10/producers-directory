@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Sparkles, Search, TrendingUp } from 'lucide-react';
+import { SearchCheck, Search, TrendingUp } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -8,7 +8,7 @@ export default function Home() {
       <nav className="bg-white/80 backdrop-blur-md shadow-sm fade-in-up">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-purple-600" />
+            <SearchCheck className="h-5 w-5 text-purple-600" />
             <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               מדריך תוכניות
             </h1>
@@ -56,7 +56,7 @@ export default function Home() {
               href="/register"
               className="inline-flex items-center gap-2 bg-white text-purple-600 px-7 py-3 rounded-full text-base font-semibold border-2 border-purple-200 hover:border-purple-600 hover:shadow-lg transition-all duration-300 button-hover ripple"
             >
-              <Sparkles className="h-5 w-5" />
+              <SearchCheck className="h-5 w-5" />
               <span>הצטרפי כמפיקה</span>
             </Link>
           </div>
@@ -68,7 +68,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-2 text-sm">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
+              <SearchCheck className="h-4 w-4" />
               <span className="font-semibold">מדריך תוכניות</span>
             </div>
             <p className="text-purple-200">
