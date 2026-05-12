@@ -9,14 +9,6 @@ interface ProgramModalProps {
 }
 
 export function ProgramModal({ program, onClose }: ProgramModalProps) {
-  // 👈 Debug זמני - תוכל למחוק אחר כך
-  console.log('Program data:', {
-    programPhone: program.phone,
-    producerPhone: program.producer?.phone,
-    programEmail: program.email,
-    producerEmail: program.producer?.email
-  });
-
   return (
     <div 
       className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" 
@@ -155,38 +147,68 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
           </div>
 
           {/* יצירת קשר */}
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-6 text-white">
-            <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
-              <Phone className="h-6 w-6" />
-              יצירת קשר
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm mb-1">מפיקה</p>
-                  <p className="font-bold text-lg">{program.producer?.name}</p>
-                </div>
-                <a 
-                  href={`tel:${(program.phone && program.phone.trim() !== '') ? program.phone : program.producer?.phone}`}
-                  className="bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:shadow-lg hover:scale-105 transition-all"
-                >
-                  {(program.phone && program.phone.trim() !== '') ? program.phone : program.producer?.phone}
-                </a>
+          <div className="bg-gradient-to-r from-purple-700 to-pink-600 rounded-3xl p-6 text-white shadow-xl">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="font-bold text-xl flex items-center gap-2">
+                  <Phone className="h-6 w-6" />
+                  יצירת קשר
+                </h3>
+                <p className="text-purple-100 text-sm mt-2 max-w-2xl">
+                  כאן מופיעים פרטי המפיקה של התוכנית. לחצי ישירות על הטלפון או על האימייל כדי ליצור קשר במהירות.
+                </p>
               </div>
-              
-              {/* אימייל אם קיים */}
-              {((program.email && program.email.trim() !== '') || program.producer?.email) && (
-                <div className="flex items-center justify-between pt-2 border-t border-white/20">
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-5 w-5 text-purple-100" />
-                    <span className="text-purple-100 text-sm">אימייל</span>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white">
+                <span className="block h-2.5 w-2.5 rounded-full bg-emerald-300"></span>
+                {program.producer?.name}
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="flex flex-col gap-3 rounded-3xl bg-white/10 border border-white/20 p-5">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-2xl bg-white/20 p-3">
+                    <Phone className="h-5 w-5 text-white" />
                   </div>
-                  <a 
-                    href={`mailto:${(program.email && program.email.trim() !== '') ? program.email : program.producer?.email}`}
-                    className="bg-white/20 text-white px-4 py-2 rounded-full font-medium hover:bg-white/30 transition-all"
-                  >
-                    {(program.email && program.email.trim() !== '') ? program.email : program.producer?.email}
-                  </a>
+                  <div>
+                    <p className="text-xs text-white/80">טלפון</p>
+                    <p className="font-semibold text-white text-lg">{(program.phone && program.phone.trim() !== '') ? program.phone : program.producer?.phone}</p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center justify-center rounded-full bg-white/15 px-3 py-2 text-xs font-semibold text-white">
+                  מספר ליצירת קשר
+                </span>
+              </div>
+
+              {((program.email && program.email.trim() !== '') || program.producer?.email) ? (
+                <div className="flex flex-col gap-3 rounded-3xl bg-white/10 border border-white/20 p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-2xl bg-white/20 p-3">
+                      <Mail className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-white/80">אימייל</p>
+                      <p className="font-semibold text-white text-lg break-all">{(program.email && program.email.trim() !== '') ? program.email : program.producer?.email}</p>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center justify-center rounded-full bg-white/15 px-3 py-2 text-xs font-semibold text-white">
+                    אימייל ליצירת קשר
+                  </span>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3 rounded-3xl bg-white/10 border border-white/20 p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-2xl bg-white/20 p-3">
+                      <Mail className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-white/80">אימייל</p>
+                      <p className="font-semibold text-white text-lg">לא זמין</p>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center justify-center rounded-full bg-white/15 px-3 py-2 text-xs font-semibold text-white/70">
+                    אין אימייל מוגדר לתוכנית זו
+                  </span>
                 </div>
               )}
             </div>
