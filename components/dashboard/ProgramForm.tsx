@@ -61,7 +61,7 @@ export function ProgramForm({
             value={formData.title}
             onChange={onFormChange}
             className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900"
-            placeholder="לדוגמה: תוכנית קסמים מרהיבה"
+            placeholder=""
             required
           />
         </div>
@@ -74,7 +74,7 @@ export function ProgramForm({
             onChange={onFormChange}
             rows={5}
             className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none text-gray-900"
-            placeholder="תארי את התוכנית בפירוט..."
+            placeholder=""
             required
           />
         </div>
@@ -82,7 +82,7 @@ export function ProgramForm({
         <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6">
           <label className="block font-semibold text-gray-700 mb-3 flex items-center gap-2">
             <ImageIcon className="h-5 w-5 text-purple-600" />
-            תמונת דוגמה
+            העלאת פרסומת
           </label>
           <CldUploadWidget
             uploadPreset="producers_upload"
@@ -103,7 +103,7 @@ export function ProgramForm({
                 className="flex items-center gap-2 px-6 py-3 border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-500 hover:bg-purple-100 transition-all font-medium text-purple-700"
               >
                 <ImageIcon className="h-5 w-5" />
-                העלאת תמונה
+               פרסומת
               </button>
             )}
           </CldUploadWidget>
