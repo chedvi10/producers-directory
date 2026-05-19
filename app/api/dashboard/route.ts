@@ -33,8 +33,6 @@ export async function POST(request: NextRequest) {
     const { producerId } = validateAuth(request);
     const body = await request.json();
     
-    console.log('POST - Received data:', body);
-    
     if (!body.title || !body.description || !body.category || !body.targetAge || !body.duration || !body.location) {
       return NextResponse.json({ 
         error: 'חסרים שדות חובה: כותרת, תיאור, קטגוריה, גיל מטרה, משך, מיקום' 
@@ -68,8 +66,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log('Program created:', program.id);
-
     if (producer.email) {
       try {
         await sendProgramPendingEmail(producer.email, producer.name, program.title);
@@ -92,8 +88,6 @@ export async function PUT(request: NextRequest) {
     const { producerId } = validateAuth(request);
     const body = await request.json();
     const { programId, ...updateData } = body;
-
-    console.log('PUT - Received data:', { programId, updateData });
 
     if (!programId) {
       return NextResponse.json({ error: 'Program ID required' }, { status: 400 });
@@ -131,8 +125,6 @@ export async function PUT(request: NextRequest) {
       },
       include: { producer: true }
     });
-
-    console.log('Program updated:', program.id);
 
     if (program.producer.email) {
       try {

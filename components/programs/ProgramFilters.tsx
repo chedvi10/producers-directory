@@ -2,6 +2,7 @@
 
 import { Search, Filter, X } from 'lucide-react';
 import { useState } from 'react';
+import { CATEGORIES, TARGET_AGES } from '@/lib/constants';
 
 interface ProgramFiltersProps {
   onFilterChange: (key: string, value: string) => void;
@@ -51,12 +52,9 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
                 onChange={(e) => onFilterChange('category', e.target.value)}
               >
                 <option value="">כל הקטגוריות</option>
-                <option value="תוכניות">תוכניות</option>
-                <option value="הרצאות">הרצאות</option>
-                <option value="אטרקציות">אטרקציות</option>
-                <option value="אתרי נופש">אתרי נופש</option>
-                <option value="מסעדות">מסעדות</option>
-                <option value="מדריכות טיולים">מדריכות טיולים</option>
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
               </select>
             </div>
 
@@ -68,14 +66,9 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
                 onChange={(e) => onFilterChange('targetAge', e.target.value)}
               >
                 <option value="">כל הגילאים</option>
-                <option value="בנים 3-6">בנים 3-6</option>
-                <option value="בנים 6-12">בנים 6-12</option>
-                <option value="בנים 12-18">בנים 12-18</option>
-                <option value="בנים 18+">בנים 18+</option>
-                <option value="בנות 3-6">בנות 3-6</option>
-                <option value="בנות 6-12">בנות 6-12</option>
-                <option value="בנות 12-18">בנות 12-18</option>
-                <option value="בנות 18+">בנות 18+</option>
+                {TARGET_AGES.map((age) => (
+                  <option key={age} value={age}>{age}</option>
+                ))}
               </select>
             </div>
 

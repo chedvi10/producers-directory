@@ -42,12 +42,5 @@ export async function GET(request: Request) {
     orderBy: { createdAt: 'desc' }
   });
 
-  // ✅ הוספת console.log לבדיקה
-  console.log('Programs with images/videos:', programs.map(p => ({
-    title: p.title,
-    images: p.images?.length || 0,
-    videos: p.videos?.length || 0
-  })));
-
   return NextResponse.json(programs);
 }

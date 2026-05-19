@@ -2,6 +2,7 @@
 
 import { X, Image as ImageIcon, Video, Loader2, Save } from 'lucide-react';
 import { CldUploadWidget } from 'next-cloudinary';
+import { CATEGORIES, TARGET_AGES } from '@/lib/constants';
 
 interface ProgramFormProps {
   formData: {
@@ -131,7 +132,7 @@ export function ProgramForm({
         <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-2xl p-6">
           <label className="block font-semibold text-gray-700 mb-3 flex items-center gap-2">
             <Video className="h-5 w-5 text-pink-600" />
-            סרטון דוגמה
+             להעלאת טריילר
           </label>
           <CldUploadWidget
             uploadPreset="producers_upload"
@@ -184,12 +185,9 @@ export function ProgramForm({
               required
             >
               <option value="">בחרי קטגוריה</option>
-              <option value="תוכניות">תוכניות</option>
-              <option value="הרצאות">הרצאות</option>
-              <option value="אטרקציות">אטרקציות</option>
-              <option value="אתרי נופש">אתרי נופש</option>
-              <option value="מסעדות">מסעדות</option>
-              <option value="מדריכות טיולים">מדריכות טיולים</option>
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
 
@@ -203,14 +201,9 @@ export function ProgramForm({
               required
             >
               <option value="">בחרי גיל מטרה</option>
-              <option value="בנים 3-6">בנים 3-6</option>
-              <option value="בנים 6-12">בנים 6-12</option>
-              <option value="בנים 12-18">בנים 12-18</option>
-              <option value="בנים 18+">בנים 18+</option>
-              <option value="בנות 3-6">בנות 3-6</option>
-              <option value="בנות 6-12">בנות 6-12</option>
-              <option value="בנות 12-18">בנות 12-18</option>
-              <option value="בנות 18+">בנות 18+</option>
+              {TARGET_AGES.map((age) => (
+                <option key={age} value={age}>{age}</option>
+              ))}
             </select>
           </div>
 
