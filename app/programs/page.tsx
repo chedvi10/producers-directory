@@ -17,7 +17,7 @@ export default function ProgramsPage() {
     const params = new URLSearchParams(filters);
     fetch(`/api/programs?${params}`)
       .then(r => r.json())
-      .then(data => { setPrograms(data); setLoading(false); });
+      .then(data => { setPrograms(Array.isArray(data) ? data : []); setLoading(false); });
   }, [filters]);
 
   const updateFilter = (key: string, value: string) => {
@@ -63,11 +63,11 @@ export default function ProgramsPage() {
             <p className="text-gray-500">טוען תוכניות...</p>
           </div>
         ) : programs.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="bg-white rounded-2xl shadow-lg p-12 max-w-md mx-auto">
-              <Search className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">לא נמצאו תוכניות</h3>
-              <p className="text-gray-500">נסי לשנות את הפילטרים</p>
+          <div className="text-center py-6">
+            <div className="bg-white rounded-xl shadow p-5 max-w-sm mx-auto">
+              <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+              <h3 className="text-base font-semibold text-gray-700 mb-1">לא נמצאו תוכניות</h3>
+              <p className="text-gray-500 text-xs">נסי לשנות את הפילטרים</p>
             </div>
           </div>
         ) : (

@@ -23,7 +23,7 @@ function rateLimit(ip: string, limit: number = 10, windowMs: number = 60000): bo
 }
 
 export function middleware(request: NextRequest) {
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
   
   // Rate limiting for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
