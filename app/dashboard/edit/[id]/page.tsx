@@ -148,7 +148,7 @@ export default function EditProgramPage() {
           className="inline-flex items-center gap-2 text-purple-600 hover:text-pink-600 font-medium mb-6 transition-colors"
         >
           <ArrowRight className="h-5 w-5" />
-          חזרה לדשבורד
+          חזרה לאזור האישי
         </Link>
 
         {/* כרטיס הטופס */}

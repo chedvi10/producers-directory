@@ -91,7 +91,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-white flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 text-purple-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">טוען את הדשבורד...</p>
+          <p className="text-gray-600">טוען...</p>
         </div>
       </div>
     );
@@ -123,7 +123,7 @@ export default function DashboardPage() {
             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
               <SearchCheck className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-gray-800">הדשבורד שלי</h1>
+            <h1 className="text-xl font-bold text-gray-800">האזור האישי שלי</h1>
           </div>
           <button
             onClick={handleLogout}
@@ -141,7 +141,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-800">שלום, {producer?.name || 'משתמש'}</h2>
-              <p className="text-gray-500 text-sm mt-1">ברוכה הבאה לדשבורד שלך</p>
+              <p className="text-gray-500 text-sm mt-1">ברוכה הבאה לאזור האישי שלך</p>
             </div>
           </div>
           <SubscriptionStatus subscription={producer?.subscription} />
