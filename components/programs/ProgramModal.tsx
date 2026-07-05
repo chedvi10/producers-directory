@@ -1,7 +1,10 @@
 'use client';
 
-import { X, Users, MapPin, Clock, DollarSign, Phone, Image as ImageIcon, Video as VideoIcon, Sparkles, Mail } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Users, MapPin, Clock, DollarSign, Phone, Image as ImageIcon, Video as VideoIcon, Sparkles, Mail, Star, Send } from 'lucide-react';
 import { Program } from '@/types/program';
+import { InquiryForm } from '@/components/InquiryForm';
+import { authFetch, getUserRole } from '@/lib/auth';
 
 interface ProgramModalProps {
   program: Program;
@@ -9,6 +12,44 @@ interface ProgramModalProps {
 }
 
 export function ProgramModal({ program, onClose }: ProgramModalProps) {
+  const [isSaved, setIsSaved] = useState(false);
+  const [showInquiry, setShowInquiry] = useState(false);
+  const isCoordinator = getUserRole() === 'coordinator';
+
+  useEffect(() => {
+    // ספירת צפייה בתוכנית (לסטטיסטיקות המפיקה).
+    // sessionStorage מונע ספירה כפולה: פתיחות חוזרות באותו ביקור לא נספרות,
+    // וגם ההרצה הכפולה של useEffect ב-StrictMode בפיתוח לא סופרת פעמיים
+    const viewedKey = `viewed:${program.id}`;
+    if (!sessionStorage.getItem(viewedKey)) {
+      sessionStorage.setItem(viewedKey, '1');
+      fetch(`/api/programs/${program.id}/view`, { method: 'POST' }).catch(() => {});
+    }
+
+    // בדיקה אם התוכנית כבר שמורה אצל הרכזת
+    if (isCoordinator) {
+      authFetch(`/api/coordinator/saved?programId=${program.id}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => data && setIsSaved(data.saved))
+        .catch(() => {});
+    }
+  }, [program.id]);
+
+  const handleToggleSave = async () => {
+    try {
+      const res = await authFetch('/api/coordinator/saved', {
+        method: 'POST',
+        body: JSON.stringify({ programId: program.id }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setIsSaved(data.saved);
+      }
+    } catch {
+      // שמירה נכשלה - לא מפילים את המודל
+    }
+  };
+
   return (
     <div 
       className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" 
@@ -26,12 +67,24 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
               {program.producer?.name}
             </p>
           </div>
-          <button 
-            onClick={onClose} 
-            className="p-2 hover:bg-white/20 rounded-full transition-colors"
-          >
-            <X className="h-6 w-6" />
-          </button>
+          <div className="flex items-center gap-2">
+            {isCoordinator && (
+              <button
+                onClick={handleToggleSave}
+                className="p-2 hover:bg-white/20 rounded-full transition-colors cursor-pointer"
+                title={isSaved ? 'הסרה מהתוכניות השמורות' : 'שמירה לאזור האישי'}
+              >
+                <Star className={`h-6 w-6 ${isSaved ? 'fill-yellow-300 text-yellow-300' : ''}`} />
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              aria-label="סגירה"
+              className="p-2 hover:bg-white/20 rounded-full transition-colors cursor-pointer"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
         </div>
 
         <div className="p-8 space-y-8">
@@ -203,9 +256,27 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
                 </div>
               )}
             </div>
+
+            {/* שליחת פנייה דרך האתר */}
+            <button
+              onClick={() => setShowInquiry(true)}
+              className="mt-6 w-full flex items-center justify-center gap-2 bg-white text-purple-700 py-3.5 rounded-2xl font-bold hover:bg-purple-50 transition-all cursor-pointer"
+            >
+              <Send className="h-5 w-5" />
+              שליחת פנייה למפיקה דרך האתר
+            </button>
           </div>
         </div>
       </div>
+
+      {/* טופס פנייה */}
+      {showInquiry && (
+        <InquiryForm
+          programId={program.id}
+          programTitle={program.title}
+          onClose={() => setShowInquiry(false)}
+        />
+      )}
     </div>
   );
 }

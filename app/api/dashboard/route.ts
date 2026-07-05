@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { validateAuth } from '@/lib/auth';
+import { requireRole } from '@/lib/api-auth';
 import { sendProgramPendingEmail } from '@/lib/email';
 
 export async function GET(request: NextRequest) {
+  // ניהול תוכניות פתוח למפיקות בלבד - רכזת לא יכולה לפרסם תוכניות
+  const auth = requireRole(request, 'producer', 'admin');
+  if (auth.response) return auth.response;
+  const { producerId } = auth.payload;
   try {
-    const { producerId } = validateAuth(request);
 
     const producer = await prisma.producer.findUnique({
       where: { id: producerId },
@@ -24,13 +27,16 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ producer, programs });
   } catch (error) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.error('GET Dashboard Error:', error);
+    return NextResponse.json({ error: 'שגיאה בטעינת הנתונים' }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
+  const auth = requireRole(request, 'producer', 'admin');
+  if (auth.response) return auth.response;
+  const { producerId } = auth.payload;
   try {
-    const { producerId } = validateAuth(request);
     const body = await request.json();
     
     if (!body.title || !body.description || !body.category || !body.targetAge || !body.duration || !body.location) {
@@ -84,8 +90,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const auth = requireRole(request, 'producer', 'admin');
+  if (auth.response) return auth.response;
+  const { producerId } = auth.payload;
   try {
-    const { producerId } = validateAuth(request);
     const body = await request.json();
     const { programId, ...updateData } = body;
 
@@ -144,8 +152,10 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const auth = requireRole(request, 'producer', 'admin');
+  if (auth.response) return auth.response;
+  const { producerId } = auth.payload;
   try {
-    const { producerId } = validateAuth(request);
     const { searchParams } = new URL(request.url);
     const programId = searchParams.get('programId');
 
@@ -167,6 +177,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.error('DELETE Dashboard Error:', error);
+    return NextResponse.json({ error: 'שגיאה במחיקת התוכנית' }, { status: 500 });
   }
 }

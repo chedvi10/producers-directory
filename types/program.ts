@@ -48,5 +48,40 @@ export interface Producer {
   name: string;
   email: string;
   phone: string;
+  role?: string; // producer / coordinator / admin
   subscription?: Subscription;
+}
+
+// תוכנית שמורה של רכזת (מועדפים + הערה + סטטוס מעקב)
+export interface SavedProgram {
+  id: string;
+  note: string | null;
+  trackStatus: string; // saved / contacted / closed / irrelevant
+  programId: string;
+  createdAt: string;
+  program: Program;
+}
+
+// פנייה מרכזת אל מפיקה
+export interface Inquiry {
+  id: string;
+  message: string;
+  status: string; // new / read / closed
+  contactName: string;
+  contactPhone: string;
+  contactEmail?: string | null;
+  programId: string;
+  createdAt: string;
+  program?: {
+    title: string;
+  };
+}
+
+// סטטיסטיקות תוכנית למפיקה
+export interface ProgramStats {
+  programId: string;
+  title: string;
+  views: number;
+  inquiriesCount: number;
+  savedCount: number;
 }

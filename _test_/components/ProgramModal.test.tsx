@@ -33,7 +33,7 @@ describe('ProgramModal', () => {
     const onClose = jest.fn();
     render(<ProgramModal program={mockProgram} onClose={onClose} />);
     
-    const closeButton = screen.getByRole('button');
+    const closeButton = screen.getByRole('button', { name: 'סגירה' });
     fireEvent.click(closeButton);
     
     expect(onClose).toHaveBeenCalledTimes(1);

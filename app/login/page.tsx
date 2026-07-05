@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SearchCheck, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
-import { setAuthToken } from '@/lib/auth';
+import { setAuthToken, getHomeRoute } from '@/lib/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -34,12 +34,9 @@ export default function LoginPage() {
       }
 
       setAuthToken(data.token);
-      
-      if (data.producer.isAdmin) {
-        router.push('/admin');
-      } else {
-        router.push('/dashboard');
-      }
+
+      // הפניה לאזור האישי המתאים לפי סוג המשתמש
+      router.push(getHomeRoute(data.producer?.role));
     } catch (err) {
       setError('שגיאה בהתחברות');
       setLoading(false);
@@ -57,7 +54,7 @@ export default function LoginPage() {
               מדריך תוכניות
             </span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">התחברות מפיקות</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">התחברות מפיקות ורכזות</h1>
         </div>
 
         {/* טופס */}

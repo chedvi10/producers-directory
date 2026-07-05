@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       where: { id: producerId },
     });
 
-    if (!admin?.isAdmin) {
+    if (admin?.role !== 'admin') {
       return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
     }
 
@@ -47,7 +47,7 @@ export async function PUT(request: NextRequest) {
       where: { id: producerId },
     });
 
-    if (!admin?.isAdmin) {
+    if (admin?.role !== 'admin') {
       return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
     }
 
@@ -86,7 +86,7 @@ export async function DELETE(request: NextRequest) {
       where: { id: producerId },
     });
 
-    if (!admin?.isAdmin) {
+    if (admin?.role !== 'admin') {
       return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
     }
 

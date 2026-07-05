@@ -20,7 +20,7 @@ describe('LoginPage', () => {
   it('מציג את הטופס התחברות', () => {
     render(<LoginPage />);
     
-    expect(screen.getByText('התחברות מפיקות')).toBeInTheDocument();
+    expect(screen.getByText('התחברות מפיקות ורכזות')).toBeInTheDocument();
     expect(screen.getByText('אימייל')).toBeInTheDocument();
     expect(screen.getByText('סיסמה')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'התחבר' })).toBeInTheDocument();

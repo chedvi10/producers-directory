@@ -26,8 +26,10 @@ export function middleware(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for') || 'unknown';
   
   // Rate limiting for API routes
+  // 100 לדקה: גלישה רגילה (כל פתיחת תוכנית = 1-2 בקשות) לא נחנקת,
+  // וגם משרד שלם מאחורי NAT עם IP משותף לא נחסם
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    if (!rateLimit(ip, 30, 60000)) { // 30 requests per minute
+    if (!rateLimit(ip, 100, 60000)) { // 100 requests per minute
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }
@@ -63,6 +65,7 @@ export const config = {
   matcher: [
     '/api/:path*',
     '/dashboard/:path*',
-    '/admin/:path*'
+    '/admin/:path*',
+    '/coordinator/:path*'
   ]
 };

@@ -5,12 +5,16 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ProgramCard } from '@/components/dashboard/ProgramCard';
 import { SubscriptionStatus } from '@/components/dashboard/SubscriptionStatus';
-import { Producer, DashboardProgram } from '@/types/program';
-import { LogOut, Plus, SearchCheck, Loader2, AlertCircle } from 'lucide-react';
-import { isAuthenticated, getAuthToken, clearAuth } from '@/lib/auth';
+import { StatsOverview } from '@/components/dashboard/StatsOverview';
+import { Producer, DashboardProgram, ProgramStats } from '@/types/program';
+import { LogOut, Plus, SearchCheck, Inbox } from 'lucide-react';
+import { isAuthenticated, authFetch, clearAuth } from '@/lib/auth';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { ErrorScreen } from '@/components/ui/ErrorScreen';
 
 export default function DashboardPage() {
   const [programs, setPrograms] = useState<DashboardProgram[]>([]);
+  const [stats, setStats] = useState<ProgramStats[]>([]);
   const [producer, setProducer] = useState<Producer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,18 +30,7 @@ export default function DashboardPage() {
 
   const fetchData = async () => {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-
-      const res = await fetch('/api/dashboard', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const res = await authFetch('/api/dashboard');
 
       if (!res.ok) {
         if (res.status === 401) {
@@ -69,13 +62,8 @@ export default function DashboardPage() {
     if (!confirm('האם את בטוחה שברצונך למחוק תוכנית זו?')) return;
 
     try {
-      const token = getAuthToken();
-      const res = await fetch(`/api/dashboard?programId=${programId}`, {
+      const res = await authFetch(`/api/dashboard?programId=${programId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
       });
 
       if (res.ok) {
@@ -86,33 +74,8 @@ export default function DashboardPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-white flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 text-purple-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">טוען...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-white flex items-center justify-center">
-        <div className="text-center bg-white rounded-2xl shadow-xl p-8 max-w-md">
-          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600 mb-6 text-lg font-semibold">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all cursor-pointer"
-          >
-            נסה שוב
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingScreen />;
+  if (error) return <ErrorScreen error={error} />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
@@ -125,13 +88,22 @@ export default function DashboardPage() {
             </div>
             <h1 className="text-xl font-bold text-gray-800">האזור האישי שלי</h1>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-gray-600 hover:text-red-600 font-medium transition-colors cursor-pointer"
-          >
-            <LogOut className="h-5 w-5" />
-            התנתק
-          </button>
+          <div className="flex items-center gap-5">
+            <Link
+              href="/dashboard/inquiries"
+              className="flex items-center gap-2 text-purple-600 hover:text-pink-600 font-medium transition-colors"
+            >
+              <Inbox className="h-5 w-5" />
+              הפניות שלי
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-gray-600 hover:text-red-600 font-medium transition-colors cursor-pointer"
+            >
+              <LogOut className="h-5 w-5" />
+              התנתק
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -146,6 +118,9 @@ export default function DashboardPage() {
           </div>
           <SubscriptionStatus subscription={producer?.subscription} />
         </div>
+
+        {/* סטטיסטיקות */}
+        <StatsOverview onStatsLoaded={setStats} />
 
         {/* כותרת + כפתור */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white rounded-xl shadow-sm border border-gray-200 p-5">
@@ -186,6 +161,7 @@ export default function DashboardPage() {
               <ProgramCard
                 key={program.id}
                 program={program}
+                stats={stats.find((s) => s.programId === program.id)}
                 onDelete={() => handleDelete(program.id)}
               />
             ))}

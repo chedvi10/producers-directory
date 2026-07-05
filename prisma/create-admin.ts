@@ -9,7 +9,7 @@ async function main() {
   const admin = await prisma.producer.upsert({
     where: { email: 'c0556731959@gmail.com' },
     update: {
-      isAdmin: true,
+      role: 'admin',
       passwordHash: passwordHash,
     },
     create: {
@@ -17,7 +17,7 @@ async function main() {
       email: 'c0556731959@gmail.com',
       phone: '0556731959',
       passwordHash: passwordHash,
-      isAdmin: true,
+      role: 'admin',
     },
   });
 

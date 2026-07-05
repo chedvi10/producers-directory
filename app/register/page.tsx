@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { SearchCheck, User, Mail, Phone, Lock, Loader2, ArrowRight, CheckCircle } from 'lucide-react';
+import { SearchCheck, User, Mail, Phone, Lock, Loader2, ArrowRight, CheckCircle, Star, Megaphone } from 'lucide-react';
+import { setAuthToken, getHomeRoute } from '@/lib/auth';
 
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [role, setRole] = useState<'producer' | 'coordinator'>('producer');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -42,6 +44,7 @@ export default function RegisterPage() {
           email: formData.email,
           phone: formData.phone,
           password: formData.password,
+          role,
         }),
       });
 
@@ -53,8 +56,9 @@ export default function RegisterPage() {
         return;
       }
 
-      localStorage.setItem('producerId', data.producerId);
-      router.push('/dashboard');
+      // התחברות אוטומטית והפניה לאזור האישי המתאים
+      setAuthToken(data.token);
+      router.push(getHomeRoute(data.role));
     } catch (err) {
       setError('שגיאה בהרשמה');
       setLoading(false);
@@ -76,8 +80,10 @@ export default function RegisterPage() {
               מדריך תוכניות
             </span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">הרשמת מפיקה חדשה</h1>
-          <p className="text-gray-600">הצטרפי לקהילת המפיקות המובילות</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">הרשמה למדריך התוכניות</h1>
+          <p className="text-gray-600">
+            {role === 'producer' ? 'הצטרפי לקהילת המפיקות המובילות' : 'שמרי תוכניות, נהלי הערות ותכנני אירועים'}
+          </p>
         </div>
 
         {/* טופס */}
@@ -89,6 +95,41 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* בחירת סוג משתמש */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                אני נרשמת בתור *
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole('producer')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                    role === 'producer'
+                      ? 'border-purple-500 bg-purple-50 text-purple-700'
+                      : 'border-gray-200 text-gray-500 hover:border-purple-200'
+                  }`}
+                >
+                  <Megaphone className="h-6 w-6" />
+                  <span className="font-semibold">מפיקה</span>
+                  <span className="text-xs text-center">מפרסמת תוכניות באלפון</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole('coordinator')}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                    role === 'coordinator'
+                      ? 'border-pink-500 bg-pink-50 text-pink-700'
+                      : 'border-gray-200 text-gray-500 hover:border-pink-200'
+                  }`}
+                >
+                  <Star className="h-6 w-6" />
+                  <span className="font-semibold">רכזת</span>
+                  <span className="text-xs text-center">מחפשת תוכניות ומתכננת אירועים</span>
+                </button>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 שם מלא *

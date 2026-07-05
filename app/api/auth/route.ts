@@ -31,14 +31,14 @@ export async function POST(request: Request) {
     const token = createToken({
       producerId: producer.id,
       email: producer.email,
-      isAdmin: producer.isAdmin
+      role: producer.role
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       token,
       producer: {
         name: producer.name,
-        isAdmin: producer.isAdmin
+        role: producer.role
       }
     });
   } catch (error) {

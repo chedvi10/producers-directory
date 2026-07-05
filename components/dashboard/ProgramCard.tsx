@@ -1,15 +1,16 @@
 'use client';
 
-import { Edit, Trash2, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Edit, Trash2, Clock, CheckCircle, XCircle, Eye, Inbox, Star } from 'lucide-react';
 import Link from 'next/link';
-import { DashboardProgram } from '@/types/program';
+import { DashboardProgram, ProgramStats } from '@/types/program';
 
 interface ProgramCardProps {
   program: DashboardProgram;
+  stats?: ProgramStats;
   onDelete: () => void;
 }
 
-export function ProgramCard({ program, onDelete }: ProgramCardProps) {
+export function ProgramCard({ program, stats, onDelete }: ProgramCardProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all overflow-hidden">
       {/* Header */}
@@ -65,6 +66,24 @@ export function ProgramCard({ program, onDelete }: ProgramCardProps) {
             </div>
           )}
         </div>
+
+        {/* סטטיסטיקות */}
+        {stats && (
+          <div className="flex items-center justify-around bg-purple-50/60 rounded-lg p-2.5 border border-purple-100 text-sm">
+            <span className="flex items-center gap-1.5 text-gray-600" title="צפיות">
+              <Eye className="h-4 w-4 text-purple-500" />
+              {stats.views}
+            </span>
+            <span className="flex items-center gap-1.5 text-gray-600" title="פניות">
+              <Inbox className="h-4 w-4 text-pink-500" />
+              {stats.inquiriesCount}
+            </span>
+            <span className="flex items-center gap-1.5 text-gray-600" title="שמירות על ידי רכזות">
+              <Star className="h-4 w-4 text-amber-500" />
+              {stats.savedCount}
+            </span>
+          </div>
+        )}
 
         {/* כפתורים */}
         <div className="flex gap-2 pt-2">
