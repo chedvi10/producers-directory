@@ -3,10 +3,12 @@ export interface Program {
   title: string;
   description: string;
   category: string;
-  targetAge: string;
+  minAge: number;
+  maxAge: number;
   duration: string;
   location: string;
   price: number | null;
+  audience?: 'MEN' | 'WOMEN' | 'BOTH';
   phone?: string;  // 👈 הוסף - טלפון ספציפי לתוכנית
   email?: string;  // 👈 הוסף - אימייל ספציפי לתוכנית
   tags?: string[];
@@ -26,10 +28,12 @@ export interface DashboardProgram {
   title: string;
   description: string;
   category: string;
-  targetAge: string;
+  minAge: number;
+  maxAge: number;
   duration?: string;
   location: string;
   price: number | null;
+  audience?: 'MEN' | 'WOMEN' | 'BOTH';
   phone?: string;  // 👈 הוסף - טלפון ספציפי לתוכנית
   email?: string;  // 👈 הוסף - אימייל ספציפי לתוכנית
   tags?: string[];

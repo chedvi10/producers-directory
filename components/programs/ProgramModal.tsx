@@ -95,6 +95,13 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
             </span>
           </div>
 
+          {/* מיועד ל */}
+          <div className="flex justify-center">
+            <span className="inline-block bg-gray-100 text-gray-800 px-4 py-1 rounded-full font-medium text-sm">
+              {program.audience === 'MEN' ? 'מיועד: גברים' : program.audience === 'WOMEN' ? 'מיועד: נשים' : 'מיועד: גם גברים וגם נשים'}
+            </span>
+          </div>
+
           {/* תמונות */}
           {program.images && program.images.length > 0 && (
             <div>
@@ -153,8 +160,8 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
                   <Users className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 font-medium">גיל מטרה</p>
-                  <p className="font-bold text-gray-800 text-lg">{program.targetAge}</p>
+                  <p className="text-sm text-gray-500 font-medium">טווח גילאים</p>
+                  <p className="font-bold text-gray-800 text-lg">{program.minAge} - {program.maxAge}</p>
                 </div>
               </div>
             </div>

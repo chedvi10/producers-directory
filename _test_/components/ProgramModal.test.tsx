@@ -6,7 +6,8 @@ const mockProgram = {
   title: 'תוכנית מודל',
   description: 'תיאור מפורט של התוכנית',
   category: 'אטרקציות',
-  targetAge: '13-18',
+  minAge: 13,
+  maxAge: 18,
   duration: '2 שעות',
   location: 'ירושלים',
   price: 300,
@@ -22,7 +23,7 @@ describe('ProgramModal', () => {
     
     expect(screen.getByText('תוכנית מודל')).toBeInTheDocument();
     expect(screen.getByText('תיאור מפורט של התוכנית')).toBeInTheDocument();
-    expect(screen.getByText('13-18')).toBeInTheDocument();
+    expect(screen.getByText('13 - 18')).toBeInTheDocument();
     expect(screen.getByText('ירושלים')).toBeInTheDocument();
     expect(screen.getByText('2 שעות')).toBeInTheDocument();
     expect(screen.getByText('₪300')).toBeInTheDocument();

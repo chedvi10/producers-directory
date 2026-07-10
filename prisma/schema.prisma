@@ -33,7 +33,8 @@ model Program {
   title       String
   description String
   category    String
-  targetAge   String
+  minAge      Int
+  maxAge      Int
   duration    String
   location    String
   price       Float?
@@ -42,6 +43,7 @@ model Program {
   tags        String[]
   images      String[] @default([])
   videos      String[] @default([])
+  audience    Audience @default(BOTH)
   status      String   @default("pending")
   views       Int      @default(0) // מונה צפיות לסטטיסטיקות
   producerId  String   @db.ObjectId
@@ -92,4 +94,9 @@ model Inquiry {
   producerId    String    @db.ObjectId
   producer      Producer  @relation("ProducerInquiries", fields: [producerId], references: [id], onDelete: Cascade)
   createdAt     DateTime  @default(now())
+  }
+enum Audience {
+  MEN
+  WOMEN
+  BOTH
 }
