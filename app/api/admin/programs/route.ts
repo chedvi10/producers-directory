@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { validateAuth } from '@/lib/auth';
 import { sendProgramApprovedEmail, sendProgramRejectedEmail } from '@/lib/email';
+import { stripNestedProducerSecret } from '@/lib/sanitize';
 
 export async function GET(request: NextRequest) {
   try {
@@ -66,7 +67,7 @@ export async function PUT(request: NextRequest) {
       await sendProgramRejectedEmail(program.producer.email, program.producer.name, program.title);
     }
 
-    return NextResponse.json(program);
+    return NextResponse.json(stripNestedProducerSecret(program));
   } catch (error) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

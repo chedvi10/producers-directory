@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireRole } from '@/lib/api-auth';
 import { sendProgramPendingEmail } from '@/lib/email';
+import { stripProducerSecret, stripNestedProducerSecret } from '@/lib/sanitize';
 
 export async function GET(request: NextRequest) {
   // ניהול תוכניות פתוח למפיקות בלבד - רכזת לא יכולה לפרסם תוכניות
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ producer, programs });
+    return NextResponse.json({ producer: stripProducerSecret(producer), programs });
   } catch (error) {
     console.error('GET Dashboard Error:', error);
     return NextResponse.json({ error: 'שגיאה בטעינת הנתונים' }, { status: 500 });
@@ -176,7 +177,7 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(program);
+    return NextResponse.json(stripNestedProducerSecret(program));
   } catch (error) {
     console.error('PUT Error:', error);
     return NextResponse.json({ 
