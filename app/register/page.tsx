@@ -1,16 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { SearchCheck, User, Mail, Phone, Lock, Loader2, ArrowRight, CheckCircle, Star, Megaphone } from 'lucide-react';
 import { setAuthToken, getHomeRoute } from '@/lib/auth';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [role, setRole] = useState<'producer' | 'coordinator'>('producer');
+  // בחירת תפקיד מראש לפי פרמטר ב-URL (למשל כשמגיעים מכפתור "הצטרפי כרכזת")
+  const [role, setRole] = useState<'producer' | 'coordinator'>(
+    searchParams.get('role') === 'coordinator' ? 'coordinator' : 'producer'
+  );
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -253,5 +257,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
   );
 }

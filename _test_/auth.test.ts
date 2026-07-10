@@ -1,4 +1,4 @@
-import { isAuthenticated, getProducerId, setAuth, clearAuth } from '@/lib/auth';
+import { isAuthenticated, getAuthToken, setAuthToken, clearAuth } from '@/lib/auth';
 
 describe('Auth Functions', () => {
   beforeEach(() => {
@@ -6,39 +6,39 @@ describe('Auth Functions', () => {
   });
 
   describe('isAuthenticated', () => {
-    it('מחזיר false כשאין producerId', () => {
+    it('מחזיר false כשאין token', () => {
       expect(isAuthenticated()).toBe(false);
     });
 
-    it('מחזיר true כשיש producerId', () => {
-      localStorage.setItem('producerId', '123');
+    it('מחזיר true כשיש token', () => {
+      localStorage.setItem('authToken', 'abc');
       expect(isAuthenticated()).toBe(true);
     });
   });
 
-  describe('getProducerId', () => {
-    it('מחזיר null כשאין producerId', () => {
-      expect(getProducerId()).toBeNull();
+  describe('getAuthToken', () => {
+    it('מחזיר null כשאין token', () => {
+      expect(getAuthToken()).toBeNull();
     });
 
-    it('מחזיר את ה-producerId כשקיים', () => {
-      localStorage.setItem('producerId', '123');
-      expect(getProducerId()).toBe('123');
+    it('מחזיר את ה-token כשקיים', () => {
+      localStorage.setItem('authToken', 'abc');
+      expect(getAuthToken()).toBe('abc');
     });
   });
 
-  describe('setAuth', () => {
-    it('שומר producerId ב-localStorage', () => {
-      setAuth('456');
-      expect(localStorage.getItem('producerId')).toBe('456');
+  describe('setAuthToken', () => {
+    it('שומר token ב-localStorage', () => {
+      setAuthToken('xyz');
+      expect(localStorage.getItem('authToken')).toBe('xyz');
     });
   });
 
   describe('clearAuth', () => {
-    it('מוחק את ה-producerId מ-localStorage', () => {
-      localStorage.setItem('producerId', '789');
+    it('מוחק את ה-token מ-localStorage', () => {
+      localStorage.setItem('authToken', 'xyz');
       clearAuth();
-      expect(localStorage.getItem('producerId')).toBeNull();
+      expect(localStorage.getItem('authToken')).toBeNull();
     });
   });
 });

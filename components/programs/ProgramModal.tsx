@@ -14,7 +14,9 @@ interface ProgramModalProps {
 export function ProgramModal({ program, onClose }: ProgramModalProps) {
   const [isSaved, setIsSaved] = useState(false);
   const [showInquiry, setShowInquiry] = useState(false);
-  const isCoordinator = getUserRole() === 'coordinator';
+  const role = getUserRole();
+  const isCoordinator = role === 'coordinator';
+  const isGuest = !role;
 
   useEffect(() => {
     // ספירת צפייה בתוכנית (לסטטיסטיקות המפיקה).
@@ -77,6 +79,15 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
                 <Star className={`h-6 w-6 ${isSaved ? 'fill-yellow-300 text-yellow-300' : ''}`} />
               </button>
             )}
+            {isGuest && (
+              <a
+                href="/register?role=coordinator"
+                className="p-2 hover:bg-white/20 rounded-full transition-colors cursor-pointer"
+                title="הצטרפי כרכזת כדי לשמור תוכניות"
+              >
+                <Star className="h-6 w-6" />
+              </a>
+            )}
             <button
               onClick={onClose}
               aria-label="סגירה"
@@ -94,6 +105,30 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
               {program.category}
             </span>
           </div>
+
+          {/* הזמנה לרכזות להצטרף - שמירה, הערות ותכנון תקציב */}
+          {isGuest && (
+            <div className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-pink-100 p-2.5 rounded-xl shrink-0">
+                  <Star className="h-5 w-5 text-pink-600" />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-800">רכזת? שמרי את התוכנית לאזור האישי</p>
+                  <p className="text-sm text-gray-600 mt-0.5">
+                    הצטרפי כרכזת כדי לסמן תוכניות בכוכב, להוסיף הערות ולתכנן תקציב לאירוע
+                  </p>
+                </div>
+              </div>
+              <a
+                href="/register?role=coordinator"
+                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:shadow-md transition-all whitespace-nowrap"
+              >
+                <Star className="h-5 w-5" />
+                הצטרפי כרכזת
+              </a>
+            </div>
+          )}
 
           {/* תמונות */}
           {program.images && program.images.length > 0 && (

@@ -19,9 +19,9 @@ describe('ProgramCard', () => {
     expect(screen.getByText('תוכנית בדיקה')).toBeInTheDocument();
     expect(screen.getByText('תיאור התוכנית לבדיקה')).toBeInTheDocument();
     expect(screen.getByText('הרצאות')).toBeInTheDocument();
-    expect(screen.getByText('גיל: 6-12')).toBeInTheDocument();
-    expect(screen.getByText('מיקום: תל אביב')).toBeInTheDocument();
-    expect(screen.getByText('מחיר: ₪500')).toBeInTheDocument();
+    expect(screen.getByText('6-12')).toBeInTheDocument();
+    expect(screen.getByText('תל אביב')).toBeInTheDocument();
+    expect(screen.getByText('₪500')).toBeInTheDocument();
   });
 
   it('לא מציג מחיר אם אין', () => {

@@ -26,7 +26,8 @@ describe('ProgramModal', () => {
     expect(screen.getByText('ירושלים')).toBeInTheDocument();
     expect(screen.getByText('2 שעות')).toBeInTheDocument();
     expect(screen.getByText('₪300')).toBeInTheDocument();
-    expect(screen.getByText(/שרה כהן - 050-1234567/)).toBeInTheDocument();
+    expect(screen.getAllByText('שרה כהן').length).toBeGreaterThan(0);
+    expect(screen.getByText('050-1234567')).toBeInTheDocument();
   });
 
   it('קורא ל-onClose כשלוחצים על X', () => {

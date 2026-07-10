@@ -17,7 +17,7 @@ export default function Home() {
             href="/login"
             className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-5 py-2 rounded-full hover:shadow-lg transition-all duration-300 font-medium text-sm button-hover ripple"
           >
-            כניסה למפיקות
+            התחברות
           </Link>
         </div>
       </nav>
@@ -57,9 +57,15 @@ export default function Home() {
               className="inline-flex items-center gap-2 bg-white text-purple-600 px-7 py-3 rounded-full text-base font-semibold border-2 border-purple-200 hover:border-purple-600 hover:shadow-lg transition-all duration-300 button-hover ripple"
             >
               <SearchCheck className="h-5 w-5" />
-              <span>הצטרפי כמפיקה</span>
+              <span>הרשמה לאתר</span>
             </Link>
           </div>
+
+          {/* הבהרה: האתר פתוח גם למפיקות וגם לרכזות */}
+          <p className="text-sm text-gray-500 fade-in-up delay-400">
+            <span className="font-semibold text-purple-600">מפיקה?</span> פרסמי את התוכניות שלך&nbsp;·&nbsp;
+            <span className="font-semibold text-pink-600">רכזת?</span> שמרי תוכניות, הוסיפי הערות ותכנני אירועים
+          </p>
         </div>
       </div>
 

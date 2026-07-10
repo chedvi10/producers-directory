@@ -28,7 +28,7 @@ describe('SubscriptionStatus', () => {
     futureDate.setDate(futureDate.getDate() + 60);
     
     const { container } = render(<SubscriptionStatus subscription={{ expiryDate: futureDate.toISOString() }} />);
-    const statusDiv = container.querySelector('.bg-green-50');
+    const statusDiv = container.querySelector('.bg-emerald-50');
     expect(statusDiv).toBeInTheDocument();
   });
 
@@ -37,7 +37,7 @@ describe('SubscriptionStatus', () => {
     futureDate.setDate(futureDate.getDate() + 15);
     
     const { container } = render(<SubscriptionStatus subscription={{ expiryDate: futureDate.toISOString() }} />);
-    const statusDiv = container.querySelector('.bg-yellow-50');
+    const statusDiv = container.querySelector('.bg-amber-50');
     expect(statusDiv).toBeInTheDocument();
   });
 

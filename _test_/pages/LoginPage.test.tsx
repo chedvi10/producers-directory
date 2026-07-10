@@ -49,7 +49,7 @@ describe('LoginPage', () => {
   it('מתחבר בהצלחה ומנתב לדשבורד', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ producerId: '123' }),
+      json: async () => ({ token: 'jwt-token-123', producer: { role: 'producer' } }),
     });
 
     render(<LoginPage />);
@@ -63,7 +63,7 @@ describe('LoginPage', () => {
     fireEvent.click(submitButton);
     
     await waitFor(() => {
-      expect(localStorage.getItem('producerId')).toBe('123');
+      expect(localStorage.getItem('authToken')).toBe('jwt-token-123');
       expect(mockPush).toHaveBeenCalledWith('/dashboard');
     });
   });

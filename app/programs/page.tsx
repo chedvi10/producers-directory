@@ -1,17 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import { SearchCheck, Search, Loader2 } from 'lucide-react';
+import { SearchCheck, Search, Loader2, LayoutDashboard, LogIn, UserPlus } from 'lucide-react';
 import { ProgramFilters } from '@/components/programs/ProgramFilters';
 import { ProgramModal } from '@/components/programs/ProgramModal';
 import { Program } from '@/types/program';
+import { getUserRole, getHomeRoute } from '@/lib/auth';
 
 export default function ProgramsPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<Program | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // התפקיד נשמר ב-localStorage וזמין רק בצד הלקוח.
+  // useSyncExternalStore מחזיר null בשרת ואת התפקיד בלקוח - בלי אי-התאמת hydration
+  const role = useSyncExternalStore(
+    () => () => {},
+    () => getUserRole(),
+    () => null
+  );
 
   useEffect(() => {
     const params = new URLSearchParams(filters);
@@ -35,12 +44,32 @@ export default function ProgramsPage() {
               מדריך תוכניות
             </h1>
           </Link>
-          <Link
-            href="/login"
-            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2.5 rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium"
-          >
-            כניסה למפיקות
-          </Link>
+          {role ? (
+            <Link
+              href={getHomeRoute(role)}
+              className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2.5 rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium"
+            >
+              <LayoutDashboard className="h-5 w-5" />
+              האזור האישי שלי
+            </Link>
+          ) : (
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link
+                href="/login"
+                className="flex items-center gap-1.5 text-purple-600 hover:text-pink-600 font-medium transition-colors"
+              >
+                <LogIn className="h-5 w-5" />
+                התחברות
+              </Link>
+              <Link
+                href="/register"
+                className="flex items-center gap-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-5 py-2.5 rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium"
+              >
+                <UserPlus className="h-5 w-5" />
+                הרשמה
+              </Link>
+            </div>
+          )}
         </div>
       </nav>
 
