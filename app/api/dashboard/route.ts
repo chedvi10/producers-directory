@@ -39,10 +39,25 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    if (!body.title || !body.description || !body.category || !body.targetAge || !body.duration || !body.location) {
+    if (!body.title || !body.description || !body.category || body.minAge === undefined || body.maxAge === undefined || !body.duration || !body.location) {
       return NextResponse.json({ 
-        error: 'חסרים שדות חובה: כותרת, תיאור, קטגוריה, גיל מטרה, משך, מיקום' 
+        error: 'חסרים שדות חובה: כותרת, תיאור, קטגוריה, גיל מינימום, גיל מקסימום, משך, מיקום' 
       }, { status: 400 });
+    }
+
+    const minAge = parseInt(body.minAge, 10);
+    const maxAge = parseInt(body.maxAge, 10);
+
+    if (Number.isNaN(minAge) || Number.isNaN(maxAge)) {
+      return NextResponse.json({ error: 'גיל מינימום וגיל מקסימום חייבים להיות מספרים תקינים' }, { status: 400 });
+    }
+
+    if (minAge < 1 || minAge > 120 || maxAge < 1 || maxAge > 120) {
+      return NextResponse.json({ error: 'הגיל חייב להיות בין 1 ל-120' }, { status: 400 });
+    }
+
+    if (minAge > maxAge) {
+      return NextResponse.json({ error: 'גיל מינימום לא יכול להיות גבוה מגיל מקסימום' }, { status: 400 });
     }
 
     const producer = await prisma.producer.findUnique({
@@ -58,10 +73,12 @@ export async function POST(request: NextRequest) {
         title: body.title,
         description: body.description,
         category: body.category,
-        targetAge: body.targetAge,
+        minAge: parseInt(body.minAge),
+        maxAge: parseInt(body.maxAge),
         duration: body.duration,
         location: body.location,
         price: body.price || 0,
+        audience: body.audience || 'BOTH',
         phone: body.phone || null,     // 👈 הוסף - טלפון ספציפי לתוכנית
         email: body.email || null,     // 👈 הוסף - אימייל ספציפי לתוכנית
         tags: body.tags || [],
@@ -109,10 +126,25 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
     }
 
-    if (!updateData.title || !updateData.description || !updateData.category || !updateData.targetAge || !updateData.duration || !updateData.location) {
+    if (!updateData.title || !updateData.description || !updateData.category || updateData.minAge === undefined || updateData.maxAge === undefined || !updateData.duration || !updateData.location) {
       return NextResponse.json({ 
-        error: 'חסרים שדות חובה: כותרת, תיאור, קטגוריה, גיל מטרה, משך, מיקום' 
+        error: 'חסרים שדות חובה: כותרת, תיאור, קטגוריה, גיל מינימום, גיל מקסימום, משך, מיקום' 
       }, { status: 400 });
+    }
+
+    const minAge = parseInt(updateData.minAge, 10);
+    const maxAge = parseInt(updateData.maxAge, 10);
+
+    if (Number.isNaN(minAge) || Number.isNaN(maxAge)) {
+      return NextResponse.json({ error: 'גיל מינימום וגיל מקסימום חייבים להיות מספרים תקינים' }, { status: 400 });
+    }
+
+    if (minAge < 1 || minAge > 120 || maxAge < 1 || maxAge > 120) {
+      return NextResponse.json({ error: 'הגיל חייב להיות בין 1 ל-120' }, { status: 400 });
+    }
+
+    if (minAge > maxAge) {
+      return NextResponse.json({ error: 'גיל מינימום לא יכול להיות גבוה מגיל מקסימום' }, { status: 400 });
     }
 
     const program = await prisma.program.update({
@@ -121,10 +153,12 @@ export async function PUT(request: NextRequest) {
         title: updateData.title,
         description: updateData.description,
         category: updateData.category,
-        targetAge: updateData.targetAge,
+        minAge,
+        maxAge,
         duration: updateData.duration,
         location: updateData.location,
         price: updateData.price || 0,
+        audience: updateData.audience || 'BOTH',
         phone: updateData.phone || null,     // 👈 הוסף - טלפון ספציפי לתוכנית
         email: updateData.email || null,     // 👈 הוסף - אימייל ספציפי לתוכנית
         images: updateData.images || [],

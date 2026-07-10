@@ -2,7 +2,7 @@
 
 import { Search, Filter, X } from 'lucide-react';
 import { useState } from 'react';
-import { CATEGORIES, TARGET_AGES } from '@/lib/constants';
+import { CATEGORIES } from '@/lib/constants';
 
 interface ProgramFiltersProps {
   onFilterChange: (key: string, value: string) => void;
@@ -58,18 +58,17 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
               </select>
             </div>
 
-            {/* גיל מטרה */}
+            {/* גיל */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">גיל מטרה</label>
-              <select 
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 bg-white transition-all"
-                onChange={(e) => onFilterChange('targetAge', e.target.value)}
-              >
-                <option value="">כל הגילאים</option>
-                {TARGET_AGES.map((age) => (
-                  <option key={age} value={age}>{age}</option>
-                ))}
-              </select>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">גיל</label>
+              <input
+                type="number"
+                placeholder="בחרי גיל..."
+                min="0"
+                max="120"
+                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 placeholder-gray-400 transition-all"
+                onChange={(e) => onFilterChange('userAge', e.target.value)}
+              />
             </div>
 
             {/* מיקום - שונה ל-input */}
@@ -92,6 +91,20 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
                 className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 placeholder-gray-400 transition-all"
                 onChange={(e) => onFilterChange('maxPrice', e.target.value)}
               />
+            </div>
+
+            {/* מי התוכנית מיועדת */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">מי מיועדת</label>
+              <select
+                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 bg-white transition-all"
+                onChange={(e) => onFilterChange('audience', e.target.value)}
+              >
+                <option value="">הכל</option>
+                <option value="MEN">גברים</option>
+                <option value="WOMEN">נשים</option>
+                <option value="BOTH">גם גברים וגם נשים</option>
+              </select>
             </div>
           </div>
         </div>

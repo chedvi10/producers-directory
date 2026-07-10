@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(programs);
   } catch (error) {
+    console.error('Admin GET error:', error);
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 }

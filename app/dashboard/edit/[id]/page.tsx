@@ -19,7 +19,9 @@ export default function EditProgramPage() {
     title: '',
     description: '',
     category: '',
-    targetAge: '',
+    audience: 'BOTH',
+    minAge: '',
+    maxAge: '',
     duration: '',
     location: '',
     price: '',
@@ -61,7 +63,9 @@ export default function EditProgramPage() {
           title: program.title,
           description: program.description,
           category: program.category,
-          targetAge: program.targetAge,
+          audience: program.audience || 'BOTH',
+          minAge: program.minAge,
+          maxAge: program.maxAge,
           duration: program.duration || '',
           location: program.location,
           price: program.price?.toString() || '',
@@ -84,11 +88,34 @@ export default function EditProgramPage() {
     setLoading(true);
     setError('');
 
+    const minAge = parseInt(formData.minAge as string, 10);
+    const maxAge = parseInt(formData.maxAge as string, 10);
+
+    if (Number.isNaN(minAge) || Number.isNaN(maxAge)) {
+      setError('יש להזין גיל מינימום וגיל מקסימום תקינים');
+      setLoading(false);
+      return;
+    }
+
+    if (minAge < 1 || minAge > 120 || maxAge < 1 || maxAge > 120) {
+      setError('הגיל חייב להיות בין 1 ל-120');
+      setLoading(false);
+      return;
+    }
+
+    if (minAge > maxAge) {
+      setError('גיל מינימום לא יכול להיות גבוה מגיל מקסימום');
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = getAuthToken();
       const data = {
         programId: params.id,
         ...formData,
+        minAge,
+        maxAge,
         price: formData.price ? parseFloat(formData.price) : 0,
         images,
         videos,

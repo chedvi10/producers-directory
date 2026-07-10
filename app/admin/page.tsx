@@ -10,7 +10,9 @@ interface Program {
   title: string;
   description: string;
   category: string;
-  targetAge: string;
+  minAge: number;
+  maxAge: number;
+  audience?: 'MEN' | 'WOMEN' | 'BOTH';
   location: string;
   price: number | null;
   status: string;
@@ -31,9 +33,11 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!isAuthenticated()) {
+      console.log('❌ Not authenticated, redirecting to login');
       router.push('/login');
       return;
     }
+    console.log('✅ Authenticated, fetching programs');
     fetchPrograms();
   }, []);
 
@@ -41,9 +45,13 @@ export default function AdminPage() {
     try {
       const token = getAuthToken();
       if (!token) {
+        console.error('❌ No token found in localStorage');
         router.push('/login');
         return;
       }
+      
+      console.log('✅ Token found:', token.substring(0, 20) + '...');
+      console.log('📤 Sending request with Authorization header...');
 
       const res = await fetch('/api/admin/programs', {
         headers: {
@@ -51,6 +59,12 @@ export default function AdminPage() {
           'Content-Type': 'application/json'
         }
       });
+
+      console.log('API Response status:', res.status);
+      
+      if (res.status === 401) {
+        console.error('❌ 401 Unauthorized - Token might be invalid or expired');
+      }
 
       if (res.status === 403) {
         alert('אין לך הרשאות מנהלת');
@@ -145,6 +159,12 @@ export default function AdminPage() {
   };
 
   const filteredPrograms = programs.filter(p => filter === 'all' || p.status === filter);
+
+  const getAudienceLabel = (audience?: 'MEN' | 'WOMEN' | 'BOTH') => {
+    if (audience === 'MEN') return 'גברים';
+    if (audience === 'WOMEN') return 'נשים';
+    return 'גם גברים וגם נשים';
+  };
 
   const pendingCount = programs.filter(p => p.status === 'pending').length;
   const approvedCount = programs.filter(p => p.status === 'approved').length;
@@ -304,8 +324,12 @@ export default function AdminPage() {
                             <span className="font-semibold text-gray-800">{program.category}</span>
                           </div>
                           <div>
-                            <span className="text-gray-500 block mb-1">גיל מטרה</span>
-                            <span className="font-semibold text-gray-800">{program.targetAge}</span>
+                            <span className="text-gray-500 block mb-1">טווח גילאים</span>
+                            <span className="font-semibold text-gray-800">{program.minAge} - {program.maxAge}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 block mb-1">מיועד ל</span>
+                            <span className="font-semibold text-gray-800">{getAudienceLabel(program.audience)}</span>
                           </div>
                           <div>
                             <span className="text-gray-500 block mb-1">מיקום</span>

@@ -52,8 +52,12 @@ export function ProgramCard({ program, stats, onDelete }: ProgramCardProps) {
         {/* פרטים */}
         <div className="bg-gray-50 rounded-lg p-3 space-y-2 text-sm border border-gray-100">
           <div className="flex justify-between">
-            <span className="text-gray-500">גיל מטרה:</span>
-            <span className="font-medium text-gray-800">{program.targetAge}</span>
+            <span className="text-gray-500">טווח גילאים:</span>
+            <span className="font-medium text-gray-800">{program.minAge} - {program.maxAge}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">מיועד ל:</span>
+            <span className="font-medium text-gray-800">{program.audience === 'MEN' ? 'גברים' : program.audience === 'WOMEN' ? 'נשים' : 'גברים ונשים'}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500">מיקום:</span>

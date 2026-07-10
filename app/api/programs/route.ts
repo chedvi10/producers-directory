@@ -16,8 +16,25 @@ export async function GET(request: Request) {
   const category = searchParams.get('category');
   if (category) where.category = category;
 
-  const targetAge = searchParams.get('targetAge');
-  if (targetAge) where.targetAge = targetAge;
+  const userAge = searchParams.get('userAge');
+  if (userAge) {
+    const age = parseInt(userAge);
+    where.AND = [
+      { minAge: { lte: age } },
+      { maxAge: { gte: age } }
+    ];
+  }
+
+  const audience = searchParams.get('audience');
+  if (audience) {
+    // audience filter: match BOTH or the specific audience
+    if (audience === 'BOTH') {
+      // nothing to add — BOTH matches all
+    } else {
+      where.AND = where.AND || [];
+      where.AND.push({ OR: [ { audience: audience }, { audience: 'BOTH' } ] });
+    }
+  }
 
   const location = searchParams.get('location');
   if (location) {

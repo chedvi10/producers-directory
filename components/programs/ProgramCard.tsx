@@ -17,7 +17,7 @@ export function ProgramCard({ program, onClick }: ProgramCardProps) {
       <div className="space-y-2 text-sm">
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4" />
-          <span>{program.targetAge}</span>
+          <span>{program.minAge} - {program.maxAge}</span>
         </div>
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4" />

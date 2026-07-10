@@ -17,7 +17,9 @@ export default function NewProgramPage() {
     title: '',
     description: '',
     category: '',
-    targetAge: '',
+    audience: 'BOTH',
+    minAge: '',
+    maxAge: '',
     duration: '',
     location: '',
     price: '',
@@ -62,6 +64,27 @@ export default function NewProgramPage() {
     setLoading(true);
     setError('');
 
+    const minAge = parseInt(formData.minAge as string, 10);
+    const maxAge = parseInt(formData.maxAge as string, 10);
+
+    if (Number.isNaN(minAge) || Number.isNaN(maxAge)) {
+      setError('יש להזין גיל מינימום וגיל מקסימום תקינים');
+      setLoading(false);
+      return;
+    }
+
+    if (minAge < 1 || minAge > 120 || maxAge < 1 || maxAge > 120) {
+      setError('הגיל חייב להיות בין 1 ל-120');
+      setLoading(false);
+      return;
+    }
+
+    if (minAge > maxAge) {
+      setError('גיל מינימום לא יכול להיות גבוה מגיל מקסימום');
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = getAuthToken();
       if (!token) {
@@ -71,6 +94,8 @@ export default function NewProgramPage() {
       
       const data = {
         ...formData,
+        minAge,
+        maxAge,
         price: formData.price ? parseFloat(formData.price) : 0,
         images,
         videos

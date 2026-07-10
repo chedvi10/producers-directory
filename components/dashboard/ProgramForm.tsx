@@ -9,7 +9,9 @@ interface ProgramFormProps {
     title: string;
     description: string;
     category: string;
-    targetAge: string;
+    audience?: 'MEN' | 'WOMEN' | 'BOTH';
+    minAge: number | string;
+    maxAge: number | string;
     duration: string;
     location: string;
     price: string;
@@ -78,6 +80,24 @@ export function ProgramForm({
             placeholder=""
             required
           />
+        </div>
+
+        <div>
+          <label className="block font-semibold text-gray-700 mb-2">מי מיועדת התוכנית</label>
+          <div className="flex gap-4 flex-wrap">
+            <label className="flex items-center gap-2">
+              <input type="radio" name="audience" value="MEN" checked={formData.audience === 'MEN'} onChange={onFormChange} />
+              <span className="text-sm">גברים</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="audience" value="WOMEN" checked={formData.audience === 'WOMEN'} onChange={onFormChange} />
+              <span className="text-sm">נשים</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="audience" value="BOTH" checked={formData.audience === 'BOTH' || !formData.audience} onChange={onFormChange} />
+              <span className="text-sm">גם גברים וגם נשים</span>
+            </label>
+          </div>
         </div>
 
         <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6">
@@ -192,19 +212,35 @@ export function ProgramForm({
           </div>
 
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">גיל מטרה *</label>
-            <select
-              name="targetAge"
-              value={formData.targetAge}
+            <label className="block font-semibold text-gray-700 mb-2">גיל מינימום *</label>
+            <input
+              name="minAge"
+              type="number"
+              min={1}
+              max={120}
+              step={1}
+              value={formData.minAge}
               onChange={onFormChange}
-              className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white transition-all text-gray-900"
+              placeholder="1"
+              className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-gray-900"
               required
-            >
-              <option value="">בחרי גיל מטרה</option>
-              {TARGET_AGES.map((age) => (
-                <option key={age} value={age}>{age}</option>
-              ))}
-            </select>
+            />
+          </div>
+
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">גיל מקסימום *</label>
+            <input
+              name="maxAge"
+              type="number"
+              min={1}
+              max={120}
+              step={1}
+              value={formData.maxAge}
+              onChange={onFormChange}
+              placeholder="120"
+              className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-gray-900"
+              required
+            />
           </div>
 
           <div>

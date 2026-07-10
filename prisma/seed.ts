@@ -30,10 +30,12 @@ async function main() {
             title: "הצגה על ערכים",
             description: "מופע לנערות בנושא ערכים והתבגרות",
             category: "תוכניות",
-            targetAge: "כיתה ט'",
+            minAge: 14,
+            maxAge: 15,
             duration: "60 דקות",
             location: "כל הארץ",
             price: 1200,
+            audience: 'WOMEN',
             tags: ["ערכים", "נוער", "הצגה"]
           }
         ]
