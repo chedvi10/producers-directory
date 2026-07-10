@@ -30,36 +30,20 @@ export function verifyToken(token: string): JWTPayload {
 // קבלת Token מבקשה
 export function getTokenFromRequest(request: NextRequest): string | null {
   const authHeader = request.headers.get('authorization');
-  console.log('🔍 Authorization header:', authHeader?.substring(0, 30) + '...' || 'NOT FOUND');
-  const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
-  console.log('📥 Extracted token:', token?.substring(0, 20) + '...' || 'NO TOKEN');
-  return token;
+  return authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
 }
 
 // בדיקת אימות ב-API
 export function validateAuth(request: NextRequest): JWTPayload {
   const token = getTokenFromRequest(request);
-  if (!token) {
-    console.error('❌ No token in request headers');
-    throw new Error('No token');
-  }
-  try {
-    const payload = verifyToken(token);
-    console.log('✅ Token verified for producer:', payload.producerId);
-    return payload;
-  } catch (error) {
-    console.error('❌ Token verification failed:', error);
-    throw error;
-  }
+  if (!token) throw new Error('No token');
+  return verifyToken(token);
 }
 
 // פונקציות לדפדפן
 export function setAuthToken(token: string) {
   if (typeof window !== 'undefined') {
     localStorage.setItem('authToken', token);
-    const stored = localStorage.getItem('authToken');
-    console.log('🔐 Token stored in localStorage:', stored?.substring(0, 20) + '...');
-    console.log('✅ Verification - Token retrieved:', stored?.substring(0, 20) + '...');
   }
 }
 
@@ -69,14 +53,7 @@ export function getAuthToken(): string | null {
 }
 
 export function isAuthenticated(): boolean {
-  if (typeof window === 'undefined') {
-    console.log('⚠️ isAuthenticated() called on server side');
-    return false;
-  }
-  const token = getAuthToken();
-  const result = !!token;
-  console.log('🔍 isAuthenticated():', result, '| Token exists:', !!token);
-  return result;
+  return !!getAuthToken();
 }
 
 export function clearAuth() {

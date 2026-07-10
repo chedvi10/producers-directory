@@ -17,7 +17,7 @@ export default function NewProgramPage() {
     title: '',
     description: '',
     category: '',
-    audience: 'BOTH',
+    audience: 'BOTH' as 'MEN' | 'WOMEN' | 'BOTH',
     minAge: '',
     maxAge: '',
     duration: '',

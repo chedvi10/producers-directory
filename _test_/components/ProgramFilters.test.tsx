@@ -9,7 +9,7 @@ describe('ProgramFilters', () => {
     expect(screen.getByPlaceholderText('₪ 0')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('הכניסי עיר או אזור...')).toBeInTheDocument();
     expect(screen.getByText('כל הקטגוריות')).toBeInTheDocument();
-    expect(screen.getByText('כל הגילאים')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('בחרי גיל...')).toBeInTheDocument();
   });
 
   it('קורא ל-onFilterChange כשמקלידים בחיפוש', () => {

@@ -19,7 +19,7 @@ export default function EditProgramPage() {
     title: '',
     description: '',
     category: '',
-    audience: 'BOTH',
+    audience: 'BOTH' as 'MEN' | 'WOMEN' | 'BOTH',
     minAge: '',
     maxAge: '',
     duration: '',

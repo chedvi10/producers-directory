@@ -33,11 +33,9 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      console.log('❌ Not authenticated, redirecting to login');
       router.push('/login');
       return;
     }
-    console.log('✅ Authenticated, fetching programs');
     fetchPrograms();
   }, []);
 
@@ -45,13 +43,9 @@ export default function AdminPage() {
     try {
       const token = getAuthToken();
       if (!token) {
-        console.error('❌ No token found in localStorage');
         router.push('/login');
         return;
       }
-      
-      console.log('✅ Token found:', token.substring(0, 20) + '...');
-      console.log('📤 Sending request with Authorization header...');
 
       const res = await fetch('/api/admin/programs', {
         headers: {
@@ -59,12 +53,6 @@ export default function AdminPage() {
           'Content-Type': 'application/json'
         }
       });
-
-      console.log('API Response status:', res.status);
-      
-      if (res.status === 401) {
-        console.error('❌ 401 Unauthorized - Token might be invalid or expired');
-      }
 
       if (res.status === 403) {
         alert('אין לך הרשאות מנהלת');

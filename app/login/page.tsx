@@ -33,25 +33,10 @@ export default function LoginPage() {
         return;
       }
 
-      console.log('✅ Login successful, received token:', data.token?.substring(0, 20) + '...');
       setAuthToken(data.token);
-<<<<<<< HEAD
 
       // הפניה לאזור האישי המתאים לפי סוג המשתמש
       router.push(getHomeRoute(data.producer?.role));
-=======
-      
-      console.log('✅ Token stored in localStorage');
-      console.log('Producer isAdmin:', data.producer.isAdmin);
-      
-      if (data.producer.isAdmin) {
-        console.log('🔓 Redirecting to /admin');
-        router.push('/admin');
-      } else {
-        console.log('🔓 Redirecting to /dashboard');
-        router.push('/dashboard');
-      }
->>>>>>> 537f482 (update)
     } catch (err) {
       setError('שגיאה בהתחברות');
       setLoading(false);
