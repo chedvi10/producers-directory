@@ -6,13 +6,14 @@ import { createToken } from '@/lib/auth';
 export async function POST(request: Request) {
   try {
     const { name, email, phone, password, role } = await request.json();
+    const normalizedEmail = (email || '').trim().toLowerCase();
 
     // רק שני סוגי הרשמה מותרים - מנהלת לא נרשמת דרך הטופס
     const userRole = role === 'coordinator' ? 'coordinator' : 'producer';
 
     // בדוק אם האימייל כבר קיים
     const existing = await prisma.producer.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (existing) {
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
     const producer = await prisma.producer.create({
       data: {
         name,
-        email,
+        email: normalizedEmail,
         phone,
         passwordHash,
         role: userRole,

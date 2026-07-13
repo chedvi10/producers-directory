@@ -14,9 +14,16 @@ export async function POST(request: Request) {
     const email = sanitizeString(validatedData.email.toLowerCase());
     const password = sanitizeString(validatedData.password);
 
-    const producer = await prisma.producer.findUnique({
+    let producer = await prisma.producer.findUnique({
       where: { email },
     });
+
+    // Fallback for legacy records that were saved with mixed-case email
+    if (!producer) {
+      producer = await prisma.producer.findFirst({
+        where: { email: { equals: email, mode: 'insensitive' } },
+      });
+    }
 
     if (!producer) {
       return NextResponse.json({ error: 'אימייל או סיסמה שגויים' }, { status: 401 });
