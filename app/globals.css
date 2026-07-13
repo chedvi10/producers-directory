@@ -90,6 +90,27 @@ select:focus-visible {
   outline-offset: 0;
 }
 
+/* Uniform border for specific filters (age/location/max price) */
+.filter-uniform-input {
+  border-width: 3px !important;
+  border-style: solid;
+  border-color: transparent !important;
+}
+
+.filter-uniform-input:focus,
+.filter-uniform-input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-width: 3px !important;
+  border-color: #9333ea !important;
+}
+
+.filter-uniform-control {
+  height: 44px;
+  padding-inline: 12px;
+  padding-block: 0;
+}
+
 /* Fade In Animations */
 @keyframes fadeInUp {
   from {

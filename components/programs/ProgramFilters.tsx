@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, Filter, X } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { useState } from 'react';
 import { CATEGORIES } from '@/lib/constants';
 
@@ -42,45 +42,60 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
             />
           </div>
 
-          {/* שאר הפילטרים */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* קטגוריה */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">קטגוריה</label>
-              <select 
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 bg-white transition-all"
-                onChange={(e) => onFilterChange('category', e.target.value)}
-              >
-                <option value="">כל הקטגוריות</option>
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
+          {/* כל הפילטרים בשורה אחת */}
+          <div className="overflow-x-auto">
+            <div className="min-w-[1020px] grid grid-cols-5 gap-4">
+              {/* קטגוריה */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">קטגוריה</label>
+                <select
+                  className="filter-uniform-input filter-uniform-control w-full rounded-xl bg-white text-gray-700 transition-all"
+                  onChange={(e) => onFilterChange('category', e.target.value)}
+                >
+                  <option value="">כל הקטגוריות</option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
 
-            {/* גיל */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">גיל</label>
-              <input
-                type="number"
-                placeholder="בחרי גיל..."
-                min="0"
-                max="120"
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 placeholder-gray-400 transition-all"
-                onChange={(e) => onFilterChange('userAge', e.target.value)}
-              />
-            </div>
+              {/* גיל יעד */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">גיל יעד</label>
+                <input
+                  type="number"
+                  placeholder="למשל 16"
+                  min="0"
+                  max="120"
+                  className="filter-uniform-input filter-uniform-control w-full rounded-xl bg-white text-gray-700 placeholder-gray-400 transition-all [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  onChange={(e) => onFilterChange('userAge', e.target.value)}
+                />
+              </div>
 
-            {/* מיקום - שונה ל-input */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">מיקום</label>
-              <input
-                type="text"
-                placeholder="הכניסי עיר או אזור..."
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 placeholder-gray-400 transition-all"
-                onChange={(e) => onFilterChange('location', e.target.value)}
-              />
-            </div>
+              {/* מי התוכנית מיועדת */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">למי מיועדת</label>
+                <select
+                  className="filter-uniform-input filter-uniform-control w-full rounded-xl bg-white text-gray-700 transition-all"
+                  onChange={(e) => onFilterChange('audience', e.target.value)}
+                >
+                  <option value="">הכל</option>
+                  <option value="MEN">גברים</option>
+                  <option value="WOMEN">נשים</option>
+                  <option value="BOTH">גם גברים וגם נשים</option>
+                </select>
+              </div>
+
+              {/* מיקום */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">מיקום</label>
+                <input
+                  type="text"
+                  placeholder="הכניסי עיר או אזור..."
+                  className="filter-uniform-input filter-uniform-control w-full rounded-xl bg-white text-gray-700 placeholder-gray-400 transition-all"
+                  onChange={(e) => onFilterChange('location', e.target.value)}
+                />
+              </div>
 
             {/* מחיר */}
             <div>
@@ -88,24 +103,12 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
               <input
                 type="number"
                 placeholder="₪ 0"
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 placeholder-gray-400 transition-all"
+                className="filter-uniform-input filter-uniform-control w-full rounded-xl bg-white text-gray-700 placeholder-gray-400 transition-all [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                 onChange={(e) => onFilterChange('maxPrice', e.target.value)}
               />
             </div>
 
-            {/* מי התוכנית מיועדת */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">מי מיועדת</label>
-              <select
-                className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700 bg-white transition-all"
-                onChange={(e) => onFilterChange('audience', e.target.value)}
-              >
-                <option value="">הכל</option>
-                <option value="MEN">גברים</option>
-                <option value="WOMEN">נשים</option>
-                <option value="BOTH">גם גברים וגם נשים</option>
-              </select>
-            </div>
+          </div>
           </div>
         </div>
       )}
