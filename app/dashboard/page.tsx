@@ -113,7 +113,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-800">שלום, {producer?.name || 'משתמש'}</h2>
-              <p className="text-gray-500 text-sm mt-1">ברוכה הבאה לאזור האישי שלך</p>
+              <p className="text-gray-500 text-sm mt-1">ברוך/ה הבא/ה לאזור האישי שלך</p>
             </div>
           </div>
           <SubscriptionStatus subscription={producer?.subscription} />

@@ -83,19 +83,19 @@ export function ProgramForm({
         </div>
 
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">מי מיועדת התוכנית</label>
+          <label className="block font-semibold text-gray-700 mb-2">למי מיועדת התוכנית</label>
           <div className="flex gap-4 flex-wrap">
-            <label className="flex items-center gap-2">
-              <input type="radio" name="audience" value="MEN" checked={formData.audience === 'MEN'} onChange={onFormChange} />
-              <span className="text-sm">גברים</span>
+            <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-white">
+              <input className="h-5 w-5 accent-purple-600" type="radio" name="audience" value="MEN" checked={formData.audience === 'MEN'} onChange={onFormChange} />
+              <span className="text-base font-semibold text-gray-800">בנים</span>
             </label>
-            <label className="flex items-center gap-2">
-              <input type="radio" name="audience" value="WOMEN" checked={formData.audience === 'WOMEN'} onChange={onFormChange} />
-              <span className="text-sm">נשים</span>
+            <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-white">
+              <input className="h-5 w-5 accent-purple-600" type="radio" name="audience" value="WOMEN" checked={formData.audience === 'WOMEN'} onChange={onFormChange} />
+              <span className="text-base font-semibold text-gray-800">בנות</span>
             </label>
-            <label className="flex items-center gap-2">
-              <input type="radio" name="audience" value="BOTH" checked={formData.audience === 'BOTH' || !formData.audience} onChange={onFormChange} />
-              <span className="text-sm">גם גברים וגם נשים</span>
+            <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-200 bg-white">
+              <input className="h-5 w-5 accent-purple-600" type="radio" name="audience" value="BOTH" checked={formData.audience === 'BOTH' || !formData.audience} onChange={onFormChange} />
+              <span className="text-base font-semibold text-gray-800">גם בנים וגם בנות</span>
             </label>
           </div>
         </div>

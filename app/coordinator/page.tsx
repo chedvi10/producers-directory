@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SavedProgramCard } from '@/components/coordinator/SavedProgramCard';
-import { BudgetSummary } from '@/components/coordinator/BudgetSummary';
 import { InquiryForm } from '@/components/InquiryForm';
 import { SavedProgram } from '@/types/program';
 import { LogOut, Search, SearchCheck, Star } from 'lucide-react';
@@ -14,6 +13,7 @@ import { ErrorScreen } from '@/components/ui/ErrorScreen';
 
 export default function CoordinatorPage() {
   const [savedPrograms, setSavedPrograms] = useState<SavedProgram[]>([]);
+  const [coordinatorName, setCoordinatorName] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [inquiryTarget, setInquiryTarget] = useState<SavedProgram | null>(null);
@@ -33,10 +33,13 @@ export default function CoordinatorPage() {
 
   const fetchData = async () => {
     try {
-      const res = await authFetch('/api/coordinator/saved');
+      const [savedRes, profileRes] = await Promise.all([
+        authFetch('/api/coordinator/saved'),
+        authFetch('/api/coordinator/profile'),
+      ]);
 
-      if (!res.ok) {
-        if (res.status === 401 || res.status === 403) {
+      if (!savedRes.ok) {
+        if (savedRes.status === 401 || savedRes.status === 403) {
           clearAuth();
           router.push('/login');
           return;
@@ -44,8 +47,14 @@ export default function CoordinatorPage() {
         throw new Error('Failed to fetch data');
       }
 
-      const data = await res.json();
+      const data = await savedRes.json();
       setSavedPrograms(data.savedPrograms || []);
+
+      if (profileRes.ok) {
+        const profileData = await profileRes.json();
+        setCoordinatorName(profileData?.coordinator?.name || '');
+      }
+
       setLoading(false);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -130,15 +139,34 @@ export default function CoordinatorPage() {
       </nav>
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        {/* סיכום תקציב */}
-        <BudgetSummary savedPrograms={savedPrograms} />
+        <h2 className="text-2xl font-bold text-gray-800">
+          שלום {coordinatorName ? `${coordinatorName},` : ','}
+          <span className="block">ברוך/ה הבא/ה לאזור האישי שלך</span>
+        </h2>
 
         {/* כותרת */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-          <h2 className="text-2xl font-bold text-gray-800">התוכניות ששמרתי</h2>
-          <p className="text-gray-500 text-sm mt-1">
-            כאן אפשר לנהל הערות, לעקוב אחרי סטטוס ולתכנן את התקציב לאירוע
-          </p>
+        <div className="relative overflow-hidden rounded-2xl border border-purple-100 bg-gradient-to-br from-white via-purple-50/40 to-pink-50/40 p-6 shadow-sm">
+          <div className="pointer-events-none absolute -top-10 -left-10 h-36 w-36 rounded-full bg-pink-100/60 blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-12 -right-10 h-40 w-40 rounded-full bg-purple-100/70 blur-2xl" />
+
+          <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">התוכניות ששמרתי</h2>
+              <p className="text-gray-600 text-sm mt-1">
+                כאן אפשר לנהל הערות ולעקוב אחרי סטטוס
+              </p>
+            </div>
+
+            <div className="inline-flex items-center gap-3 self-start rounded-2xl border border-white/80 bg-white/90 px-4 py-3 shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-100 to-pink-100">
+                <Star className="h-5 w-5 text-purple-700" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-gray-500">תוכניות שמורות</p>
+                <p className="text-lg font-bold text-gray-900">{savedPrograms.length}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* תוכניות שמורות */}

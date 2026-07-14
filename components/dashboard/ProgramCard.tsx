@@ -11,6 +11,16 @@ interface ProgramCardProps {
 }
 
 export function ProgramCard({ program, stats, onDelete }: ProgramCardProps) {
+  const audienceLabel =
+    program.audience === 'MEN' ? 'בנים' : program.audience === 'WOMEN' ? 'בנות' : 'בנים ובנות';
+
+  const audienceClasses =
+    program.audience === 'MEN'
+      ? 'bg-blue-50 text-blue-700 border-blue-200'
+      : program.audience === 'WOMEN'
+        ? 'bg-pink-50 text-pink-700 border-pink-200'
+        : 'bg-violet-50 text-violet-700 border-violet-200';
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all overflow-hidden">
       {/* Header */}
@@ -50,21 +60,28 @@ export function ProgramCard({ program, stats, onDelete }: ProgramCardProps) {
         <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">{program.description}</p>
         
         {/* פרטים */}
-        <div className="bg-gray-50 rounded-lg p-3 space-y-2 text-sm border border-gray-100">
-          <div className="flex justify-between">
-            <span className="text-gray-500">טווח גילאים:</span>
-            <span className="font-medium text-gray-800">{program.minAge} - {program.maxAge}</span>
+        <div className="bg-gray-50 rounded-lg p-3 text-sm border border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+              <p className="text-xs font-medium text-gray-500">טווח גילאים</p>
+              <p className="font-semibold text-gray-800" dir="ltr">{Math.min(program.minAge, program.maxAge)} - {Math.max(program.minAge, program.maxAge)}</p>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+              <p className="text-xs font-medium text-gray-500">למי מיועדת התוכנית</p>
+              <span className={`mt-1 inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold ${audienceClasses}`}>
+                {audienceLabel}
+              </span>
+            </div>
+
+            <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+              <p className="text-xs font-medium text-gray-500">מיקום</p>
+              <p className="font-semibold text-gray-800 truncate">{program.location}</p>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">מיועד ל:</span>
-            <span className="font-medium text-gray-800">{program.audience === 'MEN' ? 'גברים' : program.audience === 'WOMEN' ? 'נשים' : 'גברים ונשים'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">מיקום:</span>
-            <span className="font-medium text-gray-800">{program.location}</span>
-          </div>
+
           {program.price && (
-            <div className="flex justify-between">
+            <div className="flex justify-between mt-2">
               <span className="text-gray-500">מחיר:</span>
               <span className="font-semibold text-purple-600">₪{program.price}</span>
             </div>

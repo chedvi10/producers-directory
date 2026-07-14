@@ -18,6 +18,7 @@ model Producer {
   name         String
   email        String   @unique
   phone        String
+  institution  String?
   passwordHash String
   role         String   @default("producer") // producer / coordinator / admin
   subscription Subscription?
@@ -87,6 +88,7 @@ model Inquiry {
   contactName   String
   contactPhone  String
   contactEmail  String?
+  contactInstitution String?
   coordinatorId String?   @db.ObjectId
   coordinator   Producer? @relation("CoordinatorInquiries", fields: [coordinatorId], references: [id], onDelete: SetNull)
   programId     String    @db.ObjectId
@@ -94,7 +96,7 @@ model Inquiry {
   producerId    String    @db.ObjectId
   producer      Producer  @relation("ProducerInquiries", fields: [producerId], references: [id], onDelete: Cascade)
   createdAt     DateTime  @default(now())
-  }
+}
 enum Audience {
   MEN
   WOMEN

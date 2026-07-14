@@ -149,9 +149,9 @@ export default function AdminPage() {
   const filteredPrograms = programs.filter(p => filter === 'all' || p.status === filter);
 
   const getAudienceLabel = (audience?: 'MEN' | 'WOMEN' | 'BOTH') => {
-    if (audience === 'MEN') return 'גברים';
-    if (audience === 'WOMEN') return 'נשים';
-    return 'גם גברים וגם נשים';
+    if (audience === 'MEN') return 'בנים';
+    if (audience === 'WOMEN') return 'בנות';
+    return 'גם בנים וגם בנות';
   };
 
   const pendingCount = programs.filter(p => p.status === 'pending').length;
@@ -313,7 +313,7 @@ export default function AdminPage() {
                           </div>
                           <div>
                             <span className="text-gray-500 block mb-1">טווח גילאים</span>
-                            <span className="font-semibold text-gray-800">{program.minAge} - {program.maxAge}</span>
+                            <span className="font-semibold text-gray-800" dir="ltr">{Math.min(program.minAge, program.maxAge)} - {Math.max(program.minAge, program.maxAge)}</span>
                           </div>
                           <div>
                             <span className="text-gray-500 block mb-1">מיועד ל</span>

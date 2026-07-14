@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Eye, Inbox, Star } from 'lucide-react';
+import { Eye, Inbox, Check } from 'lucide-react';
 import { ProgramStats } from '@/types/program';
 import { authFetch } from '@/lib/auth';
 import { StatCards } from '@/components/ui/StatCards';
@@ -23,7 +23,7 @@ export function StatsOverview({ onStatsLoaded }: StatsOverviewProps) {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await authFetch('/api/dashboard/stats');
+        const res = await authFetch('/api/dashboard/stats', { cache: 'no-store' });
         if (!res.ok) return;
         const data = await res.json();
         setTotals(data.totals);
@@ -32,7 +32,28 @@ export function StatsOverview({ onStatsLoaded }: StatsOverviewProps) {
         // סטטיסטיקות הן תוספת - לא מפילים את הדשבורד אם נכשלו
       }
     };
+
     fetchStats();
+
+    const handleFocus = () => {
+      fetchStats();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchStats();
+      }
+    };
+
+    const intervalId = window.setInterval(fetchStats, 10000);
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   if (!totals) return null;
@@ -57,11 +78,11 @@ export function StatsOverview({ onStatsLoaded }: StatsOverviewProps) {
           href: '/dashboard/inquiries',
         },
         {
-          icon: Star,
+          icon: Check,
           label: 'שמירות על ידי רכזות',
           value: totals.saved,
-          iconBg: 'bg-amber-100',
-          iconColor: 'text-amber-600',
+          iconBg: 'bg-emerald-100',
+          iconColor: 'text-emerald-600',
         },
       ]}
     />

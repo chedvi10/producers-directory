@@ -25,14 +25,26 @@ export async function POST(request: NextRequest) {
 
     // אם הפונה מחוברת - נשייך את הפנייה לחשבון שלה
     let coordinatorId: string | null = null;
+    let coordinatorInstitution: string | null = null;
     const token = getTokenFromRequest(request);
     if (token) {
       try {
         coordinatorId = verifyToken(token).producerId;
+        if (coordinatorId) {
+          const coordinator = await prisma.producer.findUnique({
+            where: { id: coordinatorId },
+            select: { institution: true, role: true },
+          });
+          if (coordinator?.role === 'coordinator' && coordinator.institution) {
+            coordinatorInstitution = coordinator.institution;
+          }
+        }
       } catch {
         // טוקן לא תקין - הפנייה תישמר כאנונימית
       }
     }
+
+    const contactInstitution = coordinatorInstitution || (data.contactInstitution ? sanitizeString(data.contactInstitution) : null);
 
     const inquiry = await prisma.inquiry.create({
       data: {
@@ -40,6 +52,7 @@ export async function POST(request: NextRequest) {
         contactName: sanitizeString(data.contactName),
         contactPhone: sanitizeString(data.contactPhone),
         contactEmail: data.contactEmail ? sanitizeString(data.contactEmail) : null,
+        contactInstitution,
         coordinatorId,
         programId: program.id,
         producerId: program.producerId,
@@ -53,7 +66,7 @@ export async function POST(request: NextRequest) {
           program.producer.email,
           program.producer.name,
           program.title,
-          { name: inquiry.contactName, phone: inquiry.contactPhone, email: inquiry.contactEmail },
+          { name: inquiry.contactName, phone: inquiry.contactPhone, email: inquiry.contactEmail, institution: inquiry.contactInstitution },
           inquiry.message
         )
       );

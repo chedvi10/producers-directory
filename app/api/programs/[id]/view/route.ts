@@ -10,14 +10,23 @@ export async function POST(
   try {
     const { id } = await params;
 
+    const program = await prisma.program.findUnique({
+      where: { id },
+      select: { views: true },
+    });
+
+    if (!program) {
+      return NextResponse.json({ success: false, error: 'Program not found' }, { status: 404 });
+    }
+
     await prisma.program.update({
       where: { id },
-      data: { views: { increment: 1 } },
+      data: { views: (program.views ?? 0) + 1 },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    // תוכנית לא קיימת או שגיאה אחרת - לא קריטי לספירת צפיות
+    console.error('Program view count error:', error);
     return NextResponse.json({ success: false }, { status: 200 });
   }
 }

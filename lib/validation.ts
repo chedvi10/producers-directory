@@ -30,6 +30,12 @@ export const inquirySchema = z.object({
     .optional()
     .or(z.literal('')),
 
+  contactInstitution: z.string()
+    .min(2, 'יש להזין שם מוסד')
+    .max(150, 'שם המוסד ארוך מדי')
+    .optional()
+    .or(z.literal('')),
+
   message: z.string()
     .min(2, 'יש להזין הודעה')
     .max(2000, 'ההודעה ארוכה מדי'),

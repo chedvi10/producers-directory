@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Inquiry } from '@/types/program';
 import {
   ArrowRight, Inbox, Phone, Mail, User,
-  CircleDot, Eye, CheckCircle, SearchCheck, LogOut,
+  CircleDot, Eye, CheckCircle, SearchCheck, LogOut, Building2,
 } from 'lucide-react';
 import { isAuthenticated, authFetch, clearAuth } from '@/lib/auth';
 import { INQUIRY_STATUSES } from '@/lib/constants';
@@ -199,6 +199,12 @@ export default function InquiriesPage() {
                       <User className="h-4 w-4 text-purple-500" />
                       {inquiry.contactName}
                     </span>
+                    {inquiry.contactInstitution && (
+                      <span className="flex items-center gap-1.5">
+                        <Building2 className="h-4 w-4 text-purple-500" />
+                        {inquiry.contactInstitution}
+                      </span>
+                    )}
                     <a href={`tel:${inquiry.contactPhone}`} className="flex items-center gap-1.5 text-purple-600 hover:text-pink-600 font-medium" dir="ltr">
                       <Phone className="h-4 w-4" />
                       {inquiry.contactPhone}

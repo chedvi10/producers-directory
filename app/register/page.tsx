@@ -3,7 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { SearchCheck, User, Mail, Phone, Lock, Loader2, ArrowRight, CheckCircle, Star, Megaphone } from 'lucide-react';
+import { SearchCheck, User, Mail, Phone, Lock, Loader2, ArrowRight, CheckCircle, Star, Megaphone, Building2 } from 'lucide-react';
 import { setAuthToken, getHomeRoute } from '@/lib/auth';
 
 function RegisterForm() {
@@ -19,6 +19,7 @@ function RegisterForm() {
     name: '',
     email: '',
     phone: '',
+    institution: '',
     password: '',
     confirmPassword: '',
   });
@@ -47,6 +48,7 @@ function RegisterForm() {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
+          institution: formData.institution,
           password: formData.password,
           role,
         }),
@@ -186,6 +188,25 @@ function RegisterForm() {
                 />
               </div>
             </div>
+
+            {role === 'coordinator' && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  מוסד *
+                </label>
+                <div className="relative">
+                  <Building2 className="absolute right-3 top-3.5 h-5 w-5 text-gray-400" />
+                  <input
+                    name="institution"
+                    value={formData.institution}
+                    onChange={handleChange}
+                    placeholder="שם המוסד"
+                    className="w-full pr-11 p-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900"
+                    required
+                  />
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">

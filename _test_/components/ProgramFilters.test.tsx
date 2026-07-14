@@ -7,9 +7,9 @@ describe('ProgramFilters', () => {
     
     expect(screen.getByPlaceholderText('חיפוש תוכנית, מפיקה או מילת מפתח...')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('₪ 0')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('הכניסי עיר או אזור...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('עיר או אזור')).toBeInTheDocument();
     expect(screen.getByText('כל הקטגוריות')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('בחרי גיל...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('גיל רצוי')).toBeInTheDocument();
   });
 
   it('קורא ל-onFilterChange כשמקלידים בחיפוש', () => {

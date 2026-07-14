@@ -2,14 +2,15 @@
 
 import { useState, useEffect, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import { SearchCheck, Search, Loader2, LayoutDashboard, LogIn, UserPlus } from 'lucide-react';
+import { SearchCheck, Search, Loader2, LayoutDashboard, LogIn, UserPlus, Check } from 'lucide-react';
 import { ProgramFilters } from '@/components/programs/ProgramFilters';
 import { ProgramModal } from '@/components/programs/ProgramModal';
 import { Program } from '@/types/program';
-import { getUserRole, getHomeRoute } from '@/lib/auth';
+import { authFetch, getUserRole, getHomeRoute } from '@/lib/auth';
 
 export default function ProgramsPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
+  const [savedProgramIds, setSavedProgramIds] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<Program | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,8 +30,45 @@ export default function ProgramsPage() {
       .then(data => { setPrograms(Array.isArray(data) ? data : []); setLoading(false); });
   }, [filters]);
 
+  useEffect(() => {
+    if (role !== 'coordinator') {
+      setSavedProgramIds(new Set());
+      return;
+    }
+
+    authFetch('/api/coordinator/saved')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const ids = new Set<string>((data?.savedPrograms || []).map((s: { programId: string }) => s.programId));
+        setSavedProgramIds(ids);
+      })
+      .catch(() => {});
+  }, [role]);
+
   const updateFilter = (key: string, value: string) => {
     setFilters(prev => value ? { ...prev, [key]: value } : { ...prev, [key]: '' });
+  };
+
+  const handleSavedChange = (programId: string, saved: boolean) => {
+    setSavedProgramIds((prev) => {
+      const next = new Set(prev);
+      if (saved) {
+        next.add(programId);
+      } else {
+        next.delete(programId);
+      }
+      return next;
+    });
+  };
+
+  const getProgramRowClassName = (index: number) => {
+    const baseClassName = 'p-6 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 cursor-pointer transition-all duration-300 group';
+    const borderClassName = index !== programs.length - 1 ? 'border-b border-gray-100' : '';
+    return `${baseClassName} ${borderClassName}`.trim();
+  };
+
+  const handleProgramClick = (program: Program) => {
+    setSelected(program);
   };
 
   return (
@@ -74,6 +112,7 @@ export default function ProgramsPage() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+
         {/* כותרת */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
@@ -104,10 +143,8 @@ export default function ProgramsPage() {
             {programs.map((program, index) => (
               <div
                 key={program.id}
-                className={`p-6 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 cursor-pointer transition-all duration-300 group ${
-                  index !== programs.length - 1 ? 'border-b border-gray-100' : ''
-                }`}
-                onClick={() => setSelected(program)}
+                className={getProgramRowClassName(index)}
+                onClick={() => handleProgramClick(program)}
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
@@ -115,12 +152,20 @@ export default function ProgramsPage() {
                       {program.title}
                     </h3>
                     <p className="text-gray-600 line-clamp-2 mb-2">{program.description}</p>
-                    <p className="text-sm text-gray-500">מפיקה: {program.producer?.name}</p>
+                    <p className="text-sm text-gray-500">מפיק/ה: {program.producer?.name}</p>
                   </div>
                   <div className="mr-4">
-                    <span className="inline-block bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-sm px-4 py-1.5 rounded-full font-medium">
-                      {program.category}
-                    </span>
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      {role === 'coordinator' && savedProgramIds.has(program.id) && (
+                        <span className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-3 py-1.5 rounded-full font-semibold">
+                          <Check className="h-4 w-4" />
+                          שמורה
+                        </span>
+                      )}
+                      <span className="inline-block bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-sm px-4 py-1.5 rounded-full font-medium">
+                        {program.category}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -128,7 +173,13 @@ export default function ProgramsPage() {
           </div>
         )}
 
-        {selected && <ProgramModal program={selected} onClose={() => setSelected(null)} />}
+        {selected && (
+          <ProgramModal
+            program={selected}
+            onClose={() => setSelected(null)}
+            onSavedChange={handleSavedChange}
+          />
+        )}
       </div>
     </div>
   );

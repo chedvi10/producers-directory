@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X, Users, MapPin, Clock, DollarSign, Phone, Image as ImageIcon, Video as VideoIcon, Sparkles, Mail, Star, Send } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Users, MapPin, Clock, DollarSign, Phone, Image as ImageIcon, Video as VideoIcon, Sparkles, Mail, Star, Send, Plus, Check } from 'lucide-react';
 import { Program } from '@/types/program';
 import { InquiryForm } from '@/components/InquiryForm';
 import { authFetch, getUserRole } from '@/lib/auth';
@@ -9,25 +9,27 @@ import { authFetch, getUserRole } from '@/lib/auth';
 interface ProgramModalProps {
   program: Program;
   onClose: () => void;
+  onSavedChange?: (programId: string, saved: boolean) => void;
 }
 
-export function ProgramModal({ program, onClose }: ProgramModalProps) {
+export function ProgramModal({ program, onClose, onSavedChange }: ProgramModalProps) {
   const [isSaved, setIsSaved] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [saveFeedback, setSaveFeedback] = useState<{ kind: 'saved' | 'removed' | 'error'; text: string } | null>(null);
   const [showInquiry, setShowInquiry] = useState(false);
+  const countedViewRef = useRef(false);
   const role = getUserRole();
   const isCoordinator = role === 'coordinator';
   const isGuest = !role;
 
   useEffect(() => {
-    // ספירת צפייה בתוכנית (לסטטיסטיקות המפיקה).
-    // sessionStorage מונע ספירה כפולה: פתיחות חוזרות באותו ביקור לא נספרות,
-    // וגם ההרצה הכפולה של useEffect ב-StrictMode בפיתוח לא סופרת פעמיים
-    const viewedKey = `viewed:${program.id}`;
-    if (!sessionStorage.getItem(viewedKey)) {
-      sessionStorage.setItem(viewedKey, '1');
-      fetch(`/api/programs/${program.id}/view`, { method: 'POST' }).catch(() => {});
-    }
+    if (countedViewRef.current) return;
+    countedViewRef.current = true;
 
+    fetch(`/api/programs/${program.id}/view`, { method: 'POST' }).catch(() => {});
+  }, [program.id]);
+
+  useEffect(() => {
     // בדיקה אם התוכנית כבר שמורה אצל הרכזת
     if (isCoordinator) {
       authFetch(`/api/coordinator/saved?programId=${program.id}`)
@@ -37,7 +39,16 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
     }
   }, [program.id]);
 
+  useEffect(() => {
+    if (!saveFeedback) return;
+    const timer = setTimeout(() => setSaveFeedback(null), 1800);
+    return () => clearTimeout(timer);
+  }, [saveFeedback]);
+
   const handleToggleSave = async () => {
+    if (saveLoading) return;
+
+    setSaveLoading(true);
     try {
       const res = await authFetch('/api/coordinator/saved', {
         method: 'POST',
@@ -46,9 +57,20 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
       if (res.ok) {
         const data = await res.json();
         setIsSaved(data.saved);
+        onSavedChange?.(program.id, data.saved);
+        setSaveFeedback(
+          data.saved
+            ? { kind: 'saved', text: 'התוכנית שמורה באזור האישי שלך' }
+            : { kind: 'removed', text: 'התוכנית הוסרה מהאזור האישי' }
+        );
+      } else {
+        setSaveFeedback({ kind: 'error', text: 'לא הצלחנו לעדכן שמירה, נסי שוב' });
       }
     } catch {
       // שמירה נכשלה - לא מפילים את המודל
+      setSaveFeedback({ kind: 'error', text: 'לא הצלחנו לעדכן שמירה, נסי שוב' });
+    } finally {
+      setSaveLoading(false);
     }
   };
 
@@ -71,13 +93,32 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
           </div>
           <div className="flex items-center gap-2">
             {isCoordinator && (
-              <button
-                onClick={handleToggleSave}
-                className="p-2 hover:bg-white/20 rounded-full transition-colors cursor-pointer"
-                title={isSaved ? 'הסרה מהתוכניות השמורות' : 'שמירה לאזור האישי'}
-              >
-                <Star className={`h-6 w-6 ${isSaved ? 'fill-yellow-300 text-yellow-300' : ''}`} />
-              </button>
+              isSaved ? (
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/30 bg-white/20 text-sm font-semibold text-white">
+                    <Check className="h-4 w-4 text-emerald-300" />
+                    שמורה
+                  </span>
+                  <button
+                    onClick={handleToggleSave}
+                    disabled={saveLoading}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/80 bg-white text-sm font-semibold text-purple-700 hover:bg-purple-50 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    title="הסרה מהאזור האישי"
+                  >
+                    הסר מהאזור האישי
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleToggleSave}
+                  disabled={saveLoading}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/80 bg-white text-sm font-semibold text-purple-700 hover:bg-purple-50 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  title="שמירה לאזור האישי"
+                >
+                  <Plus className="h-4 w-4 text-purple-600" />
+                  שמור לאזור האישי
+                </button>
+              )
             )}
             {isGuest && (
               <a
@@ -99,6 +140,20 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
         </div>
 
         <div className="p-8 space-y-8">
+          {saveFeedback && (
+            <div
+              className={`rounded-xl border px-4 py-2.5 text-sm font-semibold animate-fadeIn ${
+                saveFeedback.kind === 'saved'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : saveFeedback.kind === 'removed'
+                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                    : 'bg-red-50 text-red-700 border-red-200'
+              }`}
+            >
+              {saveFeedback.text}
+            </div>
+          )}
+
           {/* תג קטגוריה */}
           <div className="flex justify-center">
             <span className="inline-block bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 px-6 py-2 rounded-full font-semibold text-sm">
@@ -106,7 +161,7 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
             </span>
           </div>
 
-          {/* הזמנה לרכזות להצטרף - שמירה, הערות ותכנון תקציב */}
+          {/* הזמנה לרכזות להצטרף - שמירה והערות */}
           {isGuest && (
             <div className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-start gap-3">
@@ -114,9 +169,9 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
                   <Star className="h-5 w-5 text-pink-600" />
                 </div>
                 <div>
-                  <p className="font-bold text-gray-800">רכזת? שמרי את התוכנית לאזור האישי</p>
+                  <p className="font-bold text-gray-800">רכזת? שמרי את התוכנית באזור האישי</p>
                   <p className="text-sm text-gray-600 mt-0.5">
-                    הצטרפי כרכזת כדי לסמן תוכניות בכוכב, להוסיף הערות ולתכנן תקציב לאירוע
+                    הצטרפי כרכזת כדי לסמן תוכניות בכוכב ולהוסיף הערות
                   </p>
                 </div>
               </div>
@@ -129,13 +184,6 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
               </a>
             </div>
           )}
-          {/* מיועד ל */}
-          <div className="flex justify-center">
-            <span className="inline-block bg-gray-100 text-gray-800 px-4 py-1 rounded-full font-medium text-sm">
-              {program.audience === 'MEN' ? 'מיועד: גברים' : program.audience === 'WOMEN' ? 'מיועד: נשים' : 'מיועד: גם גברים וגם נשים'}
-            </span>
-          </div>
-
           {/* תמונות */}
           {program.images && program.images.length > 0 && (
             <div>
@@ -187,7 +235,7 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
           </div>
 
           {/* פרטים */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white border-2 border-purple-100 rounded-2xl p-5 hover:shadow-lg transition-shadow">
               <div className="flex items-center gap-3">
                 <div className="bg-purple-100 p-3 rounded-xl">
@@ -195,7 +243,21 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 font-medium">טווח גילאים</p>
-                  <p className="font-bold text-gray-800 text-lg">{program.minAge} - {program.maxAge}</p>
+                  <p className="font-bold text-gray-800 text-lg" dir="ltr">{Math.min(program.minAge, program.maxAge)} - {Math.max(program.minAge, program.maxAge)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white border-2 border-indigo-100 rounded-2xl p-5 hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className="bg-indigo-100 p-3 rounded-xl">
+                  <Sparkles className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 font-medium">למי מיועדת התוכנית</p>
+                  <span className="mt-1 inline-flex items-center rounded-full bg-indigo-50 border border-indigo-200 px-3 py-1 text-sm font-bold text-indigo-700">
+                    {program.audience === 'MEN' ? 'בנים' : program.audience === 'WOMEN' ? 'בנות' : 'גם בנים וגם בנות'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -211,7 +273,9 @@ export function ProgramModal({ program, onClose }: ProgramModalProps) {
                 </div>
               </div>
             </div>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white border-2 border-purple-100 rounded-2xl p-5 hover:shadow-lg transition-shadow">
               <div className="flex items-center gap-3">
                 <div className="bg-purple-100 p-3 rounded-xl">

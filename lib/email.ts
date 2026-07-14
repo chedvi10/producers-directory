@@ -114,7 +114,7 @@ export async function sendNewInquiryEmail(
   producerEmail: string,
   producerName: string,
   programTitle: string,
-  contact: { name: string; phone: string; email?: string | null },
+  contact: { name: string; phone: string; email?: string | null; institution?: string | null },
   message: string
 ) {
   await sendTemplatedEmail({
@@ -131,6 +131,7 @@ export async function sendNewInquiryEmail(
       </div>
       <div style="background-color: #f9fafb; padding: 15px; border-radius: 8px; margin: 20px 0;">
         <p style="margin: 0; color: #374151;"><strong>שם:</strong> ${escapeHtml(contact.name)}</p>
+        ${contact.institution ? `<p style="margin: 5px 0 0 0; color: #374151;"><strong>מוסד:</strong> ${escapeHtml(contact.institution)}</p>` : ''}
         <p style="margin: 5px 0 0 0; color: #374151;"><strong>טלפון:</strong> ${escapeHtml(contact.phone)}</p>
         ${contact.email ? `<p style="margin: 5px 0 0 0; color: #374151;"><strong>אימייל:</strong> ${escapeHtml(contact.email)}</p>` : ''}
       </div>

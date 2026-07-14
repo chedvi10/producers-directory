@@ -5,7 +5,7 @@ import { createToken } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, phone, password, role } = await request.json();
+    const { name, email, phone, institution, password, role } = await request.json();
     const normalizedEmail = (email || '').trim().toLowerCase();
 
     // רק שני סוגי הרשמה מותרים - מנהלת לא נרשמת דרך הטופס
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
         name,
         email: normalizedEmail,
         phone,
+        institution: userRole === 'coordinator' && institution ? String(institution).trim() : null,
         passwordHash,
         role: userRole,
         ...(userRole === 'producer' && {

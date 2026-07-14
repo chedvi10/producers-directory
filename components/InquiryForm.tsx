@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { X, Send, Loader2, CheckCircle, User, Phone, Mail, MessageSquare } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Send, Loader2, CheckCircle, User, Phone, Mail, MessageSquare, Building2 } from 'lucide-react';
 import { authFetch } from '@/lib/auth';
 
 interface InquiryFormProps {
@@ -12,18 +12,47 @@ interface InquiryFormProps {
 
 export function InquiryForm({ programId, programTitle, onClose }: InquiryFormProps) {
   const [loading, setLoading] = useState(false);
+  const [prefillLoading, setPrefillLoading] = useState(true);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     contactName: '',
     contactPhone: '',
     contactEmail: '',
+    contactInstitution: '',
     message: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    const prefillFromCoordinatorProfile = async () => {
+      try {
+        const res = await authFetch('/api/coordinator/profile');
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const coordinator = data?.coordinator;
+        if (!coordinator) return;
+
+        setFormData((prev) => ({
+          ...prev,
+          contactName: prev.contactName || coordinator.name || '',
+          contactPhone: prev.contactPhone || coordinator.phone || '',
+          contactEmail: prev.contactEmail || coordinator.email || '',
+          contactInstitution: prev.contactInstitution || coordinator.institution || '',
+        }));
+      } catch {
+        // פונה לא מחוברת/לא רכזת - ממשיכים בלי מילוי אוטומטי
+      } finally {
+        setPrefillLoading(false);
+      }
+    };
+
+    prefillFromCoordinatorProfile();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,12 +96,12 @@ export function InquiryForm({ programId, programTitle, onClose }: InquiryFormPro
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-5 flex justify-between items-start rounded-t-3xl">
-          <div>
+        <div className="sticky top-0 z-20 relative bg-gradient-to-r from-purple-600 to-pink-600 text-white p-5 flex justify-between items-start rounded-t-3xl">
+          <div className="min-w-0 flex-1">
             <h2 className="text-xl font-bold">פנייה למפיקה</h2>
-            <p className="text-purple-100 text-sm mt-1">בנוגע לתוכנית: {programTitle}</p>
+            <p className="text-purple-100 text-sm mt-1 truncate">בנוגע לתוכנית: {programTitle}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
+          <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full transition-colors cursor-pointer shrink-0 mr-2">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -141,6 +170,20 @@ export function InquiryForm({ programId, programTitle, onClose }: InquiryFormPro
             </div>
 
             <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">מוסד</label>
+              <div className="relative">
+                <Building2 className="absolute right-3 top-3.5 h-5 w-5 text-gray-400" />
+                <input
+                  name="contactInstitution"
+                  value={formData.contactInstitution}
+                  onChange={handleChange}
+                  className="w-full pr-11 p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900"
+                  placeholder="שם המוסד"
+                />
+              </div>
+            </div>
+
+            <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1.5">הודעה *</label>
               <div className="relative">
                 <MessageSquare className="absolute right-3 top-3.5 h-5 w-5 text-gray-400" />
@@ -158,13 +201,13 @@ export function InquiryForm({ programId, programTitle, onClose }: InquiryFormPro
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || prefillLoading}
               className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              {loading ? (
+              {loading || prefillLoading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  <span>שולח...</span>
+                  <span>{prefillLoading ? 'טוען פרטים...' : 'שולח...'}</span>
                 </>
               ) : (
                 <>

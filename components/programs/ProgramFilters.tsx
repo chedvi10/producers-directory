@@ -64,7 +64,7 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">גיל יעד</label>
                 <input
                   type="number"
-                  placeholder="למשל 16"
+                  placeholder="גיל רצוי"
                   min="0"
                   max="120"
                   className="filter-uniform-input filter-uniform-control w-full rounded-xl bg-white text-gray-700 placeholder-gray-400 transition-all [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
@@ -74,15 +74,15 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
 
               {/* מי התוכנית מיועדת */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">למי מיועדת</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">למי מיועדת התוכנית</label>
                 <select
                   className="filter-uniform-input filter-uniform-control w-full rounded-xl bg-white text-gray-700 transition-all"
                   onChange={(e) => onFilterChange('audience', e.target.value)}
                 >
                   <option value="">הכל</option>
-                  <option value="MEN">גברים</option>
-                  <option value="WOMEN">נשים</option>
-                  <option value="BOTH">גם גברים וגם נשים</option>
+                  <option value="MEN">בנים</option>
+                  <option value="WOMEN">בנות</option>
+                  <option value="BOTH">גם בנים וגם בנות</option>
                 </select>
               </div>
 
@@ -91,7 +91,7 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">מיקום</label>
                 <input
                   type="text"
-                  placeholder="הכניסי עיר או אזור..."
+                  placeholder="עיר או אזור"
                   className="filter-uniform-input filter-uniform-control w-full rounded-xl bg-white text-gray-700 placeholder-gray-400 transition-all"
                   onChange={(e) => onFilterChange('location', e.target.value)}
                 />
@@ -99,7 +99,7 @@ export function ProgramFilters({ onFilterChange }: ProgramFiltersProps) {
 
             {/* מחיר */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">מחיר מקסימלי</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">מחיר</label>
               <input
                 type="number"
                 placeholder="₪ 0"

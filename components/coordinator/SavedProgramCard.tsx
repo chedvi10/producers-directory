@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Trash2, Phone, MapPin, StickyNote, Send, Check, AlertCircle } from 'lucide-react';
 import { SavedProgram } from '@/types/program';
 import { TRACK_STATUSES } from '@/lib/constants';
@@ -23,8 +23,15 @@ interface SavedProgramCardProps {
 export function SavedProgramCard({ saved, onUpdate, onRemove, onInquiry }: SavedProgramCardProps) {
   const [note, setNote] = useState(saved.note || '');
   const [noteStatus, setNoteStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [trackStatus, setTrackStatus] = useState(saved.trackStatus);
+  const [trackStatusSaving, setTrackStatusSaving] = useState(false);
+  const [trackStatusError, setTrackStatusError] = useState(false);
 
   const program = saved.program;
+
+  useEffect(() => {
+    setTrackStatus(saved.trackStatus);
+  }, [saved.trackStatus]);
 
   const handleSaveNote = async () => {
     setNoteStatus('saving');
@@ -33,6 +40,24 @@ export function SavedProgramCard({ saved, onUpdate, onRemove, onInquiry }: Saved
     if (ok) {
       setTimeout(() => setNoteStatus('idle'), 2000);
     }
+  };
+
+  const handleTrackStatusChange = async (nextStatus: string) => {
+    if (nextStatus === trackStatus || trackStatusSaving) return;
+
+    const prevStatus = trackStatus;
+    setTrackStatusError(false);
+    setTrackStatus(nextStatus);
+    setTrackStatusSaving(true);
+
+    const ok = await onUpdate(saved.id, { trackStatus: nextStatus });
+
+    if (!ok) {
+      setTrackStatus(prevStatus);
+      setTrackStatusError(true);
+    }
+
+    setTrackStatusSaving(false);
   };
 
   return (
@@ -53,15 +78,21 @@ export function SavedProgramCard({ saved, onUpdate, onRemove, onInquiry }: Saved
           {TRACK_STATUSES.map((s) => (
             <button
               key={s.value}
-              onClick={() => onUpdate(saved.id, { trackStatus: s.value })}
+              onClick={() => handleTrackStatusChange(s.value)}
+              disabled={trackStatusSaving}
               className={`text-xs px-3 py-1.5 rounded-lg font-medium border transition-all cursor-pointer ${
-                saved.trackStatus === s.value ? STATUS_COLORS[s.value] : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                trackStatus === s.value ? STATUS_COLORS[s.value] : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
               }`}
             >
               {s.label}
             </button>
           ))}
         </div>
+        {trackStatusError && (
+          <span className="inline-flex items-center gap-1 text-xs text-red-600 font-medium">
+            <AlertCircle className="h-3.5 w-3.5" /> עדכון סטטוס נכשל, נסי שוב
+          </span>
+        )}
 
         {/* פרטי התוכנית */}
         <div className="bg-gray-50 rounded-lg p-3 space-y-2 text-sm border border-gray-100">

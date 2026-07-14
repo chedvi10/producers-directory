@@ -52,6 +52,7 @@ export interface Producer {
   name: string;
   email: string;
   phone: string;
+  institution?: string;
   role?: string; // producer / coordinator / admin
   subscription?: Subscription;
 }
@@ -74,6 +75,7 @@ export interface Inquiry {
   contactName: string;
   contactPhone: string;
   contactEmail?: string | null;
+  contactInstitution?: string | null;
   programId: string;
   createdAt: string;
   program?: {
