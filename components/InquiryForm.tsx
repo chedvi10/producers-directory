@@ -92,11 +92,11 @@ export function InquiryForm({ programId, programTitle, onClose }: InquiryFormPro
       }}
     >
       <div
-        className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slideUp"
+        className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-slideUp"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-20 relative bg-gradient-to-r from-purple-600 to-pink-600 text-white p-5 flex justify-between items-start rounded-t-3xl">
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-5 flex justify-between items-start shrink-0">
           <div className="min-w-0 flex-1">
             <h2 className="text-xl font-bold">פנייה למפיקה</h2>
             <p className="text-purple-100 text-sm mt-1 truncate">בנוגע לתוכנית: {programTitle}</p>
@@ -119,7 +119,7 @@ export function InquiryForm({ programId, programTitle, onClose }: InquiryFormPro
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-center text-sm">
                 {error}

@@ -80,11 +80,11 @@ export function ProgramModal({ program, onClose, onSavedChange }: ProgramModalPr
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slideUp" 
+        className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-slideUp"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 flex justify-between items-start rounded-t-3xl z-10">
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 flex justify-between items-start shrink-0">
           <div className="flex-1">
             <h2 className="text-3xl font-bold mb-2">{program.title}</h2>
             <p className="text-purple-100 flex items-center gap-2">
@@ -139,7 +139,7 @@ export function ProgramModal({ program, onClose, onSavedChange }: ProgramModalPr
           </div>
         </div>
 
-        <div className="p-8 space-y-8">
+        <div className="p-8 space-y-8 overflow-y-auto">
           {saveFeedback && (
             <div
               className={`rounded-xl border px-4 py-2.5 text-sm font-semibold animate-fadeIn ${
