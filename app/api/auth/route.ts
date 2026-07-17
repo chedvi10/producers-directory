@@ -5,6 +5,10 @@ import { createToken } from '@/lib/auth';
 import { validateLogin, sanitizeString } from '@/lib/validation';
 import { z } from 'zod';
 
+// אימייל המנהלת - רשומה קיימת עם האימייל הזה מקודמת ל-role admin בהתחברות.
+// מתקן מצב שבו חשבון המנהלת בפרודקשן נשמר עם role שגוי (למשל 'producer').
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'c0556731959@gmail.com').toLowerCase();
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -35,17 +39,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'אימייל או סיסמה שגויים' }, { status: 401 });
     }
 
+    let role = producer.role;
+    if (producer.email.toLowerCase() === ADMIN_EMAIL && role !== 'admin') {
+      await prisma.producer.update({
+        where: { id: producer.id },
+        data: { role: 'admin' },
+      });
+      role = 'admin';
+    }
+
     const token = createToken({
       producerId: producer.id,
       email: producer.email,
-      role: producer.role
+      role
     });
 
     return NextResponse.json({
       token,
       producer: {
         name: producer.name,
-        role: producer.role
+        role
       }
     });
   } catch (error) {
