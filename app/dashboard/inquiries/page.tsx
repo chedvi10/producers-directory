@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Inquiry } from '@/types/program';
@@ -8,7 +8,7 @@ import {
   ArrowRight, Inbox, Phone, Mail, User,
   CircleDot, Eye, CheckCircle, SearchCheck, LogOut, Building2,
 } from 'lucide-react';
-import { isAuthenticated, authFetch, clearAuth } from '@/lib/auth';
+import { authFetch, logoutAndRedirect, requireAuthOrRedirect } from '@/lib/auth';
 import { INQUIRY_STATUSES } from '@/lib/constants';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { ErrorScreen } from '@/components/ui/ErrorScreen';
@@ -31,22 +31,13 @@ export default function InquiriesPage() {
   const [filter, setFilter] = useState<string>('all');
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/login');
-      return;
-    }
-    fetchInquiries();
-  }, []);
-
-  const fetchInquiries = async () => {
+  const fetchInquiries = useCallback(async () => {
     try {
       const res = await authFetch('/api/inquiries');
 
       if (!res.ok) {
         if (res.status === 401) {
-          clearAuth();
-          router.push('/login');
+          logoutAndRedirect(router);
           return;
         }
         throw new Error('Failed to fetch');
@@ -60,7 +51,12 @@ export default function InquiriesPage() {
       setError('שגיאה בטעינת הפניות');
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (!requireAuthOrRedirect(router)) return;
+    fetchInquiries();
+  }, [fetchInquiries, router]);
 
   const handleStatusChange = async (inquiryId: string, status: string) => {
     try {
@@ -80,8 +76,7 @@ export default function InquiriesPage() {
   };
 
   const handleLogout = () => {
-    clearAuth();
-    router.push('/login');
+    logoutAndRedirect(router);
   };
 
   const filtered = filter === 'all' ? inquiries : inquiries.filter((i) => i.status === filter);

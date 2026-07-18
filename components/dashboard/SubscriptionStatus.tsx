@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import { Subscription } from '@/types/program';
 
 interface SubscriptionStatusProps {

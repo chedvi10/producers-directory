@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Trash2, Phone, MapPin, StickyNote, Send, Check, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Trash2, Phone, MapPin, StickyNote, Send, Check, AlertCircle, Coins } from 'lucide-react';
 import { SavedProgram } from '@/types/program';
 import { TRACK_STATUSES } from '@/lib/constants';
 
@@ -18,9 +18,10 @@ interface SavedProgramCardProps {
   onUpdate: (savedId: string, data: { note?: string; trackStatus?: string }) => Promise<boolean>;
   onRemove: (savedId: string) => void;
   onInquiry: (saved: SavedProgram) => void;
+  onToast?: (message: string, kind?: 'success' | 'error' | 'info') => void;
 }
 
-export function SavedProgramCard({ saved, onUpdate, onRemove, onInquiry }: SavedProgramCardProps) {
+export function SavedProgramCard({ saved, onUpdate, onRemove, onInquiry, onToast }: SavedProgramCardProps) {
   const [note, setNote] = useState(saved.note || '');
   const [noteStatus, setNoteStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [trackStatus, setTrackStatus] = useState(saved.trackStatus);
@@ -29,16 +30,15 @@ export function SavedProgramCard({ saved, onUpdate, onRemove, onInquiry }: Saved
 
   const program = saved.program;
 
-  useEffect(() => {
-    setTrackStatus(saved.trackStatus);
-  }, [saved.trackStatus]);
-
   const handleSaveNote = async () => {
     setNoteStatus('saving');
     const ok = await onUpdate(saved.id, { note });
     setNoteStatus(ok ? 'saved' : 'error');
     if (ok) {
+      onToast?.('ההערה נשמרה בהצלחה', 'success');
       setTimeout(() => setNoteStatus('idle'), 2000);
+    } else {
+      onToast?.('שמירת ההערה נכשלה, נסי שוב', 'error');
     }
   };
 
@@ -55,6 +55,9 @@ export function SavedProgramCard({ saved, onUpdate, onRemove, onInquiry }: Saved
     if (!ok) {
       setTrackStatus(prevStatus);
       setTrackStatusError(true);
+      onToast?.('עדכון סטטוס נכשל, נסי שוב', 'error');
+    } else {
+      onToast?.('סטטוס התוכנית עודכן', 'success');
     }
 
     setTrackStatusSaving(false);
@@ -108,7 +111,10 @@ export function SavedProgramCard({ saved, onUpdate, onRemove, onInquiry }: Saved
           </div>
           {program.price != null && (
             <div className="flex justify-between">
-              <span className="text-gray-500">מחיר:</span>
+              <span className="text-gray-500 flex items-center gap-1">
+                <Coins className="h-3.5 w-3.5" />
+                מחיר:
+              </span>
               <span className="font-semibold text-purple-600">
                 {program.price === 0 ? 'ללא עלות' : `₪${program.price}`}
               </span>
@@ -125,7 +131,7 @@ export function SavedProgramCard({ saved, onUpdate, onRemove, onInquiry }: Saved
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="למשל: דיברתי איתה, פנויה רק בחנוכה..."
+            placeholder="משהו שחשוב לך לזכור..."
             rows={2}
             className="w-full p-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-gray-900 resize-none"
           />

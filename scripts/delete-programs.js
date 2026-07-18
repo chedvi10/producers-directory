@@ -5,6 +5,8 @@
   IMPORTANT: This is destructive and irreversible. Use with care.
 */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
+
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
 

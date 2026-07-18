@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SavedProgramCard } from '@/components/coordinator/SavedProgramCard';
 import { InquiryForm } from '@/components/InquiryForm';
+import { ToastNotification } from '@/components/ui/ToastNotification';
 import { SavedProgram } from '@/types/program';
 import { LogOut, Search, SearchCheck, Star } from 'lucide-react';
-import { isAuthenticated, authFetch, clearAuth, getUserRole } from '@/lib/auth';
+import { authFetch, getHomeRoute, getServerUserRole, logoutAndRedirect, requireAuthOrRedirect } from '@/lib/auth';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { ErrorScreen } from '@/components/ui/ErrorScreen';
 
@@ -17,21 +18,14 @@ export default function CoordinatorPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [inquiryTarget, setInquiryTarget] = useState<SavedProgram | null>(null);
+  const [toast, setToast] = useState<{ message: string; kind: 'success' | 'error' | 'info' } | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/login');
-      return;
-    }
-    if (getUserRole() !== 'coordinator') {
-      router.push('/dashboard');
-      return;
-    }
-    fetchData();
-  }, []);
+  const showToast = (message: string, kind: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ message, kind });
+  };
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [savedRes, profileRes] = await Promise.all([
         authFetch('/api/coordinator/saved'),
@@ -40,8 +34,7 @@ export default function CoordinatorPage() {
 
       if (!savedRes.ok) {
         if (savedRes.status === 401 || savedRes.status === 403) {
-          clearAuth();
-          router.push('/login');
+          logoutAndRedirect(router);
           return;
         }
         throw new Error('Failed to fetch data');
@@ -61,11 +54,31 @@ export default function CoordinatorPage() {
       setError('שגיאה בטעינת הנתונים');
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (!requireAuthOrRedirect(router)) return;
+
+    const bootstrap = async () => {
+      const role = await getServerUserRole();
+      if (!role) {
+        logoutAndRedirect(router);
+        return;
+      }
+
+      if (role !== 'coordinator') {
+        router.replace(getHomeRoute(role));
+        return;
+      }
+
+      fetchData();
+    };
+
+    void bootstrap();
+  }, [fetchData, router]);
 
   const handleLogout = () => {
-    clearAuth();
-    router.push('/login');
+    logoutAndRedirect(router);
   };
 
   // מחזיר הצלחה/כשלון כדי שהכרטיס יציג משוב אמיתי ולא "נשמר" על עדכון שנכשל
@@ -99,11 +112,21 @@ export default function CoordinatorPage() {
 
       if (res.ok) {
         setSavedPrograms((prev) => prev.filter((s) => s.id !== savedId));
+        showToast('התוכנית הוסרה מהאזור האישי', 'info');
+      } else {
+        showToast('לא הצלחנו להסיר את התוכנית, נסי שוב', 'error');
       }
     } catch (err) {
       console.error('Delete error:', err);
+      showToast('לא הצלחנו להסיר את התוכנית, נסי שוב', 'error');
     }
   };
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 2200);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   if (loading) return <LoadingScreen />;
   if (error) return <ErrorScreen error={error} />;
@@ -196,6 +219,7 @@ export default function CoordinatorPage() {
                 onUpdate={handleUpdate}
                 onRemove={handleRemove}
                 onInquiry={setInquiryTarget}
+                onToast={showToast}
               />
             ))}
           </div>
@@ -210,6 +234,12 @@ export default function CoordinatorPage() {
           onClose={() => setInquiryTarget(null)}
         />
       )}
+
+      <ToastNotification
+        visible={!!toast}
+        message={toast?.message || ''}
+        kind={toast?.kind || 'info'}
+      />
     </div>
   );
 }

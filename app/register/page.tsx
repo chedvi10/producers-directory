@@ -63,9 +63,9 @@ function RegisterForm() {
       }
 
       // התחברות אוטומטית והפניה לאזור האישי המתאים
-      setAuthToken(data.token);
+      setAuthToken(data.token, data.role);
       router.push(getHomeRoute(data.role));
-    } catch (err) {
+    } catch {
       setError('שגיאה בהרשמה');
       setLoading(false);
     }

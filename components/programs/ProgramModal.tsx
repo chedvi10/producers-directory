@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Users, MapPin, Clock, DollarSign, Phone, Image as ImageIcon, Video as VideoIcon, Sparkles, Mail, Star, Send, Plus, Check } from 'lucide-react';
+import { X, Users, MapPin, Clock, DollarSign, Phone, Image as ImageIcon, Video as VideoIcon, Sparkles, Mail, Star, Send, Check } from 'lucide-react';
 import { Program } from '@/types/program';
 import { InquiryForm } from '@/components/InquiryForm';
 import { authFetch, getUserRole } from '@/lib/auth';
+import { ToastNotification } from '@/components/ui/ToastNotification';
 
 interface ProgramModalProps {
   program: Program;
@@ -37,7 +38,7 @@ export function ProgramModal({ program, onClose, onSavedChange }: ProgramModalPr
         .then((data) => data && setIsSaved(data.saved))
         .catch(() => {});
     }
-  }, [program.id]);
+  }, [program.id, isCoordinator]);
 
   useEffect(() => {
     if (!saveFeedback) return;
@@ -115,8 +116,8 @@ export function ProgramModal({ program, onClose, onSavedChange }: ProgramModalPr
                   className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/80 bg-white text-sm font-semibold text-purple-700 hover:bg-purple-50 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                   title="שמירה לאזור האישי"
                 >
-                  <Plus className="h-4 w-4 text-purple-600" />
-                  שמור לאזור האישי
+                  
+                  שמור באזור האישי
                 </button>
               )
             )}
@@ -140,20 +141,6 @@ export function ProgramModal({ program, onClose, onSavedChange }: ProgramModalPr
         </div>
 
         <div className="p-8 space-y-8 overflow-y-auto">
-          {saveFeedback && (
-            <div
-              className={`rounded-xl border px-4 py-2.5 text-sm font-semibold animate-fadeIn ${
-                saveFeedback.kind === 'saved'
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : saveFeedback.kind === 'removed'
-                    ? 'bg-amber-50 text-amber-700 border-amber-200'
-                    : 'bg-red-50 text-red-700 border-red-200'
-              }`}
-            >
-              {saveFeedback.text}
-            </div>
-          )}
-
           {/* תג קטגוריה */}
           <div className="flex justify-center">
             <span className="inline-block bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 px-6 py-2 rounded-full font-semibold text-sm">
@@ -194,6 +181,7 @@ export function ProgramModal({ program, onClose, onSavedChange }: ProgramModalPr
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {program.images.map((url, index) => (
                   <div key={index} className="relative group overflow-hidden rounded-2xl shadow-lg">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={url}
                       alt={`${program.title} - תמונה ${index + 1}`}
@@ -382,6 +370,18 @@ export function ProgramModal({ program, onClose, onSavedChange }: ProgramModalPr
           onClose={() => setShowInquiry(false)}
         />
       )}
+
+      <ToastNotification
+        visible={!!saveFeedback}
+        message={saveFeedback?.text || ''}
+        kind={
+          saveFeedback?.kind === 'error'
+            ? 'error'
+            : saveFeedback?.kind === 'removed'
+              ? 'info'
+              : 'success'
+        }
+      />
     </div>
   );
 }

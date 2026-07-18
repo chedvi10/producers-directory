@@ -76,7 +76,7 @@ export function InquiryForm({ programId, programTitle, onClose }: InquiryFormPro
 
       setSent(true);
       setLoading(false);
-    } catch (err) {
+    } catch {
       setError('שגיאה בשליחת הפנייה');
       setLoading(false);
     }

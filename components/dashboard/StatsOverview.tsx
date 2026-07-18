@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Eye, Inbox, Check } from 'lucide-react';
 import { ProgramStats } from '@/types/program';
 import { authFetch } from '@/lib/auth';
@@ -20,20 +20,22 @@ interface StatsOverviewProps {
 export function StatsOverview({ onStatsLoaded }: StatsOverviewProps) {
   const [totals, setTotals] = useState<StatsTotals | null>(null);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await authFetch('/api/dashboard/stats', { cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        setTotals(data.totals);
-        onStatsLoaded?.(data.stats || []);
-      } catch {
-        // סטטיסטיקות הן תוספת - לא מפילים את הדשבורד אם נכשלו
-      }
-    };
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await authFetch('/api/dashboard/stats', { cache: 'no-store' });
+      if (!res.ok) return;
+      const data = await res.json();
+      setTotals(data.totals);
+      onStatsLoaded?.(data.stats || []);
+    } catch {
+      // סטטיסטיקות הן תוספת - לא מפילים את הדשבורד אם נכשלו
+    }
+  }, [onStatsLoaded]);
 
-    fetchStats();
+  useEffect(() => {
+    const initialFetchTimer = window.setTimeout(() => {
+      void fetchStats();
+    }, 0);
 
     const handleFocus = () => {
       fetchStats();
@@ -50,11 +52,12 @@ export function StatsOverview({ onStatsLoaded }: StatsOverviewProps) {
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
+      window.clearTimeout(initialFetchTimer);
       window.clearInterval(intervalId);
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [fetchStats]);
 
   if (!totals) return null;
 

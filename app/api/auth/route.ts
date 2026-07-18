@@ -1,13 +1,46 @@
 import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { createToken } from '@/lib/auth';
+import { createToken, validateAuth } from '@/lib/auth';
 import { validateLogin, sanitizeString } from '@/lib/validation';
 import { z } from 'zod';
 
 // אימייל המנהלת - רשומה קיימת עם האימייל הזה מקודמת ל-role admin בהתחברות.
 // מתקן מצב שבו חשבון המנהלת בפרודקשן נשמר עם role שגוי (למשל 'producer').
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'c0556731959@gmail.com').toLowerCase();
+
+export async function GET(request: NextRequest) {
+  try {
+    const auth = validateAuth(request);
+    const producer = await prisma.producer.findUnique({
+      where: { id: auth.producerId },
+      select: { id: true, name: true, email: true, role: true },
+    });
+
+    if (!producer) {
+      return NextResponse.json({ error: 'לא נמצא משתמש' }, { status: 404 });
+    }
+
+    if (producer.email.toLowerCase() === ADMIN_EMAIL && producer.role !== 'admin') {
+      await prisma.producer.update({
+        where: { id: producer.id },
+        data: { role: 'admin' },
+      });
+
+      return NextResponse.json({
+        producer: {
+          ...producer,
+          role: 'admin',
+        },
+      });
+    }
+
+    return NextResponse.json({ producer });
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+}
 
 export async function POST(request: Request) {
   try {

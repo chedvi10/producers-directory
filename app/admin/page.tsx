@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { LogOut, CheckCircle, XCircle, Trash2, Shield, Loader2, AlertCircle, Filter } from 'lucide-react';
-import { getAuthToken, isAuthenticated, clearAuth } from '@/lib/auth';
+import { getAuthToken, getHomeRoute, getServerUserRole, logoutAndRedirect, requireAuthOrRedirect } from '@/lib/auth';
 
 interface Program {
   id: string;
@@ -31,15 +31,7 @@ export default function AdminPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/login');
-      return;
-    }
-    fetchPrograms();
-  }, []);
-
-  const fetchPrograms = async () => {
+  const fetchPrograms = useCallback(async () => {
     try {
       const token = getAuthToken();
       if (!token) {
@@ -50,19 +42,19 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/programs', {
         headers: {
           'Authorization': `Bearer ${token}`,
+          'X-Auth-Role': 'admin',
           'Content-Type': 'application/json'
         }
       });
 
       if (res.status === 403) {
         alert('אין לך הרשאות מנהלת');
-        router.push('/dashboard');
+        router.replace('/login');
         return;
       }
 
       if (res.status === 401) {
-        clearAuth();
-        router.push('/login');
+        logoutAndRedirect(router);
         return;
       }
 
@@ -78,7 +70,28 @@ export default function AdminPage() {
       setError('שגיאה בטעינת התוכניות');
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (!requireAuthOrRedirect(router)) return;
+
+    const bootstrap = async () => {
+      const role = await getServerUserRole();
+      if (!role) {
+        logoutAndRedirect(router);
+        return;
+      }
+
+      if (role !== 'admin') {
+        router.replace(getHomeRoute(role));
+        return;
+      }
+
+      fetchPrograms();
+    };
+
+    void bootstrap();
+  }, [fetchPrograms, router]);
 
   const handleApprove = async (programId: string) => {
     try {
@@ -87,16 +100,23 @@ export default function AdminPage() {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ programId, status: 'approved' }),
       });
 
       if (res.ok) {
-        setPrograms(programs.map(p => p.id === programId ? { ...p, status: 'approved' } : p));
+        setPrograms((currentPrograms) =>
+          currentPrograms.map((program) => (program.id === programId ? { ...program, status: 'approved' } : program))
+        );
+        return;
       }
+
+      const { error: message } = await res.json().catch(() => ({ error: 'שגיאה באישור התוכנית' }));
+      alert(message || 'שגיאה באישור התוכנית');
     } catch (error) {
       console.error('Approve error:', error);
+      alert('שגיאה באישור התוכנית');
     }
   };
 
@@ -107,16 +127,23 @@ export default function AdminPage() {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ programId, status: 'rejected' }),
       });
 
       if (res.ok) {
-        setPrograms(programs.map(p => p.id === programId ? { ...p, status: 'rejected' } : p));
+        setPrograms((currentPrograms) =>
+          currentPrograms.map((program) => (program.id === programId ? { ...program, status: 'rejected' } : program))
+        );
+        return;
       }
+
+      const { error: message } = await res.json().catch(() => ({ error: 'שגיאה בדחיית התוכנית' }));
+      alert(message || 'שגיאה בדחיית התוכנית');
     } catch (error) {
       console.error('Reject error:', error);
+      alert('שגיאה בדחיית התוכנית');
     }
   };
 
@@ -129,12 +156,13 @@ export default function AdminPage() {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'X-Auth-Role': 'admin',
           'Content-Type': 'application/json'
         }
       });
 
       if (res.ok) {
-        setPrograms(programs.filter(p => p.id !== programId));
+        setPrograms((currentPrograms) => currentPrograms.filter((program) => program.id !== programId));
       }
     } catch (error) {
       console.error('Delete error:', error);
@@ -142,8 +170,7 @@ export default function AdminPage() {
   };
 
   const handleLogout = () => {
-    clearAuth();
-    router.push('/login');
+    logoutAndRedirect(router);
   };
 
   const filteredPrograms = programs.filter(p => filter === 'all' || p.status === filter);
@@ -214,7 +241,7 @@ export default function AdminPage() {
         {/* כותרת וסטטיסטיקות */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">ניהול תוכניות</h2>
-          <p className="text-gray-600">סה"כ {programs.length} תוכניות במערכת</p>
+          <p className="text-gray-600">סה&quot;כ {programs.length} תוכניות במערכת</p>
         </div>
 
         {/* פילטרים בגווני סגול-ורוד */}

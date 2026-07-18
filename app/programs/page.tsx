@@ -32,7 +32,6 @@ export default function ProgramsPage() {
 
   useEffect(() => {
     if (role !== 'coordinator') {
-      setSavedProgramIds(new Set());
       return;
     }
 

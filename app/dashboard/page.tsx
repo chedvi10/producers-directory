@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ProgramCard } from '@/components/dashboard/ProgramCard';
@@ -8,7 +8,7 @@ import { SubscriptionStatus } from '@/components/dashboard/SubscriptionStatus';
 import { StatsOverview } from '@/components/dashboard/StatsOverview';
 import { Producer, DashboardProgram, ProgramStats } from '@/types/program';
 import { LogOut, Plus, SearchCheck, Inbox } from 'lucide-react';
-import { isAuthenticated, authFetch, clearAuth } from '@/lib/auth';
+import { authFetch, getHomeRoute, getServerUserRole, logoutAndRedirect, requireAuthOrRedirect } from '@/lib/auth';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { ErrorScreen } from '@/components/ui/ErrorScreen';
 
@@ -20,25 +20,21 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/login');
-      return;
-    }
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const res = await authFetch('/api/dashboard');
 
       if (!res.ok) {
         if (res.status === 401) {
-          clearAuth();
-          router.push('/login');
+          logoutAndRedirect(router);
           return;
         }
-        throw new Error('Failed to fetch data');
+        if (res.status === 403) {
+          router.replace('/login');
+          return;
+        }
+        const errorBody = await res.text();
+        throw new Error(`Failed to fetch data (${res.status}): ${errorBody || res.statusText}`);
       }
 
       const data = await res.json();
@@ -51,11 +47,31 @@ export default function DashboardPage() {
       setPrograms([]);
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (!requireAuthOrRedirect(router)) return;
+
+    const bootstrap = async () => {
+      const role = await getServerUserRole();
+      if (!role) {
+        logoutAndRedirect(router);
+        return;
+      }
+
+      if (role !== 'producer') {
+        router.replace(getHomeRoute(role));
+        return;
+      }
+
+      fetchData();
+    };
+
+    void bootstrap();
+  }, [fetchData, router]);
 
   const handleLogout = () => {
-    clearAuth();
-    router.push('/login');
+    logoutAndRedirect(router);
   };
 
   const handleDelete = async (programId: string) => {
@@ -126,7 +142,7 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white rounded-xl shadow-sm border border-gray-200 p-5">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">התוכניות שלי</h2>
-            <p className="text-gray-500 text-sm mt-1">סה"כ {programs?.length || 0} תוכניות</p>
+            <p className="text-gray-500 text-sm mt-1">סה&quot;כ {programs?.length || 0} תוכניות</p>
           </div>
           <Link
             href="/dashboard/new"

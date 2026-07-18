@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { getAuthToken } from '@/lib/auth';
+import { getAuthToken, getUserRole, redirectToRoleHome } from '@/lib/auth';
+import { getErrorMessage } from '@/lib/errors';
+import { showSuccessPopup } from '@/lib/popup';
 import { ProgramForm } from '@/components/dashboard/ProgramForm';
 
 export default function NewProgramPage() {
@@ -29,6 +31,12 @@ export default function NewProgramPage() {
 
   // מילוי אוטומטי של פרטי המפיקה
   useEffect(() => {
+    const role = getUserRole();
+    if (role && role !== 'producer') {
+      redirectToRoleHome(router);
+      return;
+    }
+
     const fetchProducerData = async () => {
       try {
         const token = getAuthToken();
@@ -57,7 +65,7 @@ export default function NewProgramPage() {
     };
 
     fetchProducerData();
-  }, []);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,25 +131,17 @@ export default function NewProgramPage() {
         throw new Error(result.error || 'שגיאה בשמירה');
       }
 
-      alert('התוכנית נשמרה בהצלחה!');
+      await showSuccessPopup('התוכנית נשמרה בהצלחה', 'אפשר לחזור עכשיו לאזור האישי.');
       router.push('/dashboard');
-    } catch (err: any) {
-      console.error('Error:', err);
-      setError(err.message || 'שגיאה בשמירת התוכנית');
+    } catch (error: unknown) {
+      console.error('Error:', error);
+      setError(getErrorMessage(error, 'שגיאה בשמירת התוכנית'));
       setLoading(false);
     }
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const removeImage = () => {
-    setImages([]);
-  };
-
-  const removeVideo = () => {
-    setVideos([]);
   };
 
   return (

@@ -1,15 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, X, Loader2, Edit } from 'lucide-react';
-import { getAuthToken, isAuthenticated } from '@/lib/auth';
+import { ArrowRight, Loader2, Edit } from 'lucide-react';
+import { getAuthToken, getUserRole, isAuthenticated, redirectToRoleHome } from '@/lib/auth';
+import { getErrorMessage } from '@/lib/errors';
+import { showSuccessPopup } from '@/lib/popup';
 import { ProgramForm } from '@/components/dashboard/ProgramForm';
 
 export default function EditProgramPage() {
   const router = useRouter();
   const params = useParams();
+  const programId = Array.isArray(params.id) ? params.id[0] : params.id;
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState('');
@@ -29,16 +32,14 @@ export default function EditProgramPage() {
     email: ''
   });
 
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/login');
-      return;
-    }
-    fetchProgram();
-  }, []);
-
-  const fetchProgram = async () => {
+  const fetchProgram = useCallback(async () => {
     try {
+      if (!programId) {
+        setError('מזהה תוכנית לא תקין');
+        setFetching(false);
+        return;
+      }
+
       const token = getAuthToken();
       const res = await fetch('/api/dashboard', {
         headers: {
@@ -52,11 +53,16 @@ export default function EditProgramPage() {
           router.push('/login');
           return;
         }
-        throw new Error('Failed to fetch');
+        if (res.status === 403) {
+          redirectToRoleHome(router);
+          return;
+        }
+        const errorBody = await res.text();
+        throw new Error(`Failed to fetch (${res.status}): ${errorBody || res.statusText}`);
       }
 
-      const data = await res.json();
-      const program = data.programs.find((p: any) => p.id === params.id);
+        const data = await res.json();
+        const program = data.programs.find((p: { id: string }) => p.id === programId);
       
       if (program) {
         setFormData({
@@ -81,7 +87,22 @@ export default function EditProgramPage() {
       setError('שגיאה בטעינת התוכנית');
       setFetching(false);
     }
-  };
+  }, [programId, router]);
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.push('/login');
+      return;
+    }
+
+    const role = getUserRole();
+    if (role && role !== 'producer') {
+      redirectToRoleHome(router);
+      return;
+    }
+
+    fetchProgram();
+  }, [fetchProgram, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,9 +131,15 @@ export default function EditProgramPage() {
     }
 
     try {
+      if (!programId) {
+        setError('מזהה תוכנית לא תקין');
+        setLoading(false);
+        return;
+      }
+
       const token = getAuthToken();
       const data = {
-        programId: params.id,
+        programId,
         ...formData,
         minAge,
         maxAge,
@@ -135,24 +162,16 @@ export default function EditProgramPage() {
         throw new Error(result.error || 'שגיאה בעדכון');
       }
 
-      alert('התוכנית עודכנה בהצלחה!');
+      await showSuccessPopup('התוכנית עודכנה בהצלחה', 'השינויים נשמרו ואפשר לחזור לאזור האישי.');
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, 'שגיאה בעדכון'));
       setLoading(false);
     }
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const removeImage = () => {
-    setImages([]);
-  };
-
-  const removeVideo = () => {
-    setVideos([]);
   };
 
   if (fetching) {

@@ -5,6 +5,8 @@ import { validateAuth } from '@/lib/auth';
 import { sendProgramApprovedEmail, sendProgramRejectedEmail } from '@/lib/email';
 import { stripNestedProducerSecret } from '@/lib/sanitize';
 
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'c0556731959@gmail.com').toLowerCase();
+
 export async function GET(request: NextRequest) {
   try {
     const { producerId } = validateAuth(request);
@@ -14,8 +16,17 @@ export async function GET(request: NextRequest) {
       where: { id: producerId },
     });
 
-    if (admin?.role !== 'admin') {
+    const isAdmin = admin?.role === 'admin' || admin?.email.toLowerCase() === ADMIN_EMAIL;
+
+    if (!isAdmin) {
       return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
+    }
+
+    if (admin && admin.role !== 'admin' && admin.email.toLowerCase() === ADMIN_EMAIL) {
+      await prisma.producer.update({
+        where: { id: admin.id },
+        data: { role: 'admin' },
+      });
     }
 
     // שליפת כל התוכניות עם פרטי המפיקה
@@ -44,13 +55,26 @@ export async function PUT(request: NextRequest) {
     const { producerId } = validateAuth(request);
     const { programId, status } = await request.json();
 
+    if (!programId || !['approved', 'rejected'].includes(status)) {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    }
+
     // בדיקה שזו באמת מנהלת
     const admin = await prisma.producer.findUnique({
       where: { id: producerId },
     });
 
-    if (admin?.role !== 'admin') {
+    const isAdmin = admin?.role === 'admin' || admin?.email.toLowerCase() === ADMIN_EMAIL;
+
+    if (!isAdmin) {
       return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
+    }
+
+    if (admin && admin.role !== 'admin' && admin.email.toLowerCase() === ADMIN_EMAIL) {
+      await prisma.producer.update({
+        where: { id: admin.id },
+        data: { role: 'admin' },
+      });
     }
 
     // עדכון סטטוס התוכנית
@@ -62,14 +86,20 @@ export async function PUT(request: NextRequest) {
 
     // שליחת מייל למפיקה לפי הסטטוס
     if (status === 'approved') {
-      await sendProgramApprovedEmail(program.producer.email, program.producer.name, program.title);
+      void sendProgramApprovedEmail(program.producer.email, program.producer.name, program.title);
     } else if (status === 'rejected') {
-      await sendProgramRejectedEmail(program.producer.email, program.producer.name, program.title);
+      void sendProgramRejectedEmail(program.producer.email, program.producer.name, program.title);
     }
 
     return NextResponse.json(stripNestedProducerSecret(program));
   } catch (error) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.error('Admin PUT error:', error);
+
+    if (error instanceof Error && error.message === 'No token') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    return NextResponse.json({ error: 'Failed to update program' }, { status: 500 });
   }
 }
 
@@ -88,8 +118,17 @@ export async function DELETE(request: NextRequest) {
       where: { id: producerId },
     });
 
-    if (admin?.role !== 'admin') {
+    const isAdmin = admin?.role === 'admin' || admin?.email.toLowerCase() === ADMIN_EMAIL;
+
+    if (!isAdmin) {
       return NextResponse.json({ error: 'אין לך הרשאות מנהלת' }, { status: 403 });
+    }
+
+    if (admin && admin.role !== 'admin' && admin.email.toLowerCase() === ADMIN_EMAIL) {
+      await prisma.producer.update({
+        where: { id: admin.id },
+        data: { role: 'admin' },
+      });
     }
 
     // מחיקת התוכנית
@@ -98,7 +137,7 @@ export async function DELETE(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 }

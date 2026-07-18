@@ -9,8 +9,9 @@ type WithPasswordHash = { passwordHash?: unknown };
 export function stripProducerSecret<T extends WithPasswordHash>(
   producer: T
 ): Omit<T, 'passwordHash'> {
-  const { passwordHash: _passwordHash, ...safe } = producer;
-  return safe;
+  const safe = { ...producer } as T;
+  delete (safe as WithPasswordHash).passwordHash;
+  return safe as Omit<T, 'passwordHash'>;
 }
 
 /** מסיר את passwordHash מהמפיקה המקוננת בתוך אובייקט (למשל תוכנית עם include producer). */

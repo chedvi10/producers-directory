@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const where: any = { status: 'approved' };
+  const where: Prisma.ProgramWhereInput = { status: { in: ['approved', 'pending'] } };
 
   const search = searchParams.get('search');
   if (search) {

@@ -33,11 +33,11 @@ export default function LoginPage() {
         return;
       }
 
-      setAuthToken(data.token);
+      setAuthToken(data.token, data.producer?.role);
 
       // הפניה לאזור האישי המתאים לפי סוג המשתמש
       router.push(getHomeRoute(data.producer?.role));
-    } catch (err) {
+    } catch {
       setError('שגיאה בהתחברות');
       setLoading(false);
     }

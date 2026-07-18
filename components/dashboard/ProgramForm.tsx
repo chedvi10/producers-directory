@@ -2,7 +2,23 @@
 
 import { X, Image as ImageIcon, Video, Loader2, Save } from 'lucide-react';
 import { CldUploadWidget } from 'next-cloudinary';
-import { CATEGORIES, TARGET_AGES } from '@/lib/constants';
+import { CATEGORIES } from '@/lib/constants';
+
+type FormChangeEvent = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>;
+
+interface UploadInfo {
+  secure_url?: string;
+}
+
+interface UploadResult {
+  info?: UploadInfo;
+}
+
+function getSecureUrl(result: unknown): string | undefined {
+  if (!result || typeof result !== 'object') return undefined;
+  const maybeResult = result as UploadResult;
+  return maybeResult.info?.secure_url;
+}
 
 interface ProgramFormProps {
   formData: {
@@ -22,7 +38,7 @@ interface ProgramFormProps {
   videos: string[];
   loading: boolean;
   error: string;
-  onFormChange: (e: any) => void;
+  onFormChange: (e: FormChangeEvent) => void;
   onImageUpload: (url: string) => void;
   onImageRemove: () => void;
   onVideoUpload: (url: string) => void;
@@ -107,8 +123,9 @@ export function ProgramForm({
           </label>
           <CldUploadWidget
             uploadPreset="producers_upload"
-            onSuccess={(result: any) => {
-              onImageUpload(result.info.secure_url);
+            onSuccess={(result: unknown) => {
+              const secureUrl = getSecureUrl(result);
+              if (secureUrl) onImageUpload(secureUrl);
             }}
             options={{
               maxFiles: 1,
@@ -132,6 +149,7 @@ export function ProgramForm({
           {images.length > 0 && (
             <div className="mt-4">
               <div className="relative group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={images[0]}
                   alt="תמונת התוכנית"
@@ -156,8 +174,9 @@ export function ProgramForm({
           </label>
           <CldUploadWidget
             uploadPreset="producers_upload"
-            onSuccess={(result: any) => {
-              onVideoUpload(result.info.secure_url);
+            onSuccess={(result: unknown) => {
+              const secureUrl = getSecureUrl(result);
+              if (secureUrl) onVideoUpload(secureUrl);
             }}
             options={{
               maxFiles: 1,

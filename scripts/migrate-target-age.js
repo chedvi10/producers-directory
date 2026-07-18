@@ -8,6 +8,7 @@
  * הרצה:  node scripts/migrate-target-age.js
  * הסקריפט אינו הרסני - הוא רק ממלא שדות חסרים ומסיר את targetAge המיושן.
  */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
