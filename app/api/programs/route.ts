@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import { Prisma } from '@prisma/client';
+import { Prisma, Audience } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const where: Prisma.ProgramWhereInput = { status: { in: ['approved', 'pending'] } };
+  const andClauses: Prisma.ProgramWhereInput[] = [];
 
   const search = searchParams.get('search');
   if (search) {
@@ -20,20 +21,24 @@ export async function GET(request: Request) {
   const userAge = searchParams.get('userAge');
   if (userAge) {
     const age = parseInt(userAge);
-    where.AND = [
+    andClauses.push(
       { minAge: { lte: age } },
       { maxAge: { gte: age } }
-    ];
+    );
   }
 
-  const audience = searchParams.get('audience');
+  const audienceParam = searchParams.get('audience');
+  const audience =
+    audienceParam === 'MEN' || audienceParam === 'WOMEN' || audienceParam === 'BOTH'
+      ? (audienceParam as Audience)
+      : null;
+
   if (audience) {
     // audience filter: match BOTH or the specific audience
     if (audience === 'BOTH') {
       // nothing to add — BOTH matches all
     } else {
-      where.AND = where.AND || [];
-      where.AND.push({ OR: [ { audience: audience }, { audience: 'BOTH' } ] });
+      andClauses.push({ OR: [{ audience }, { audience: 'BOTH' }] });
     }
   }
 
@@ -45,6 +50,10 @@ export async function GET(request: Request) {
 
   const maxPrice = searchParams.get('maxPrice');
   if (maxPrice) where.price = { lte: parseFloat(maxPrice) };
+
+  if (andClauses.length > 0) {
+    where.AND = andClauses;
+  }
 
   const programs = await prisma.program.findMany({
     where,
