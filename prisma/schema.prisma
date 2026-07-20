@@ -46,6 +46,7 @@ model Program {
   videos      String[] @default([])
   audience    Audience @default(BOTH)
   status      String   @default("pending")
+  previousApprovedData Json?
   views       Int      @default(0) // מונה צפיות לסטטיסטיקות
   producerId  String   @db.ObjectId
   producer    Producer @relation(fields: [producerId], references: [id])

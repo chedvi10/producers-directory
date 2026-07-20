@@ -7,7 +7,7 @@ import { SavedProgramCard } from '@/components/coordinator/SavedProgramCard';
 import { InquiryForm } from '@/components/InquiryForm';
 import { ToastNotification } from '@/components/ui/ToastNotification';
 import { SavedProgram } from '@/types/program';
-import { LogOut, Search, SearchCheck, Star } from 'lucide-react';
+import { LogOut, Search, SearchCheck } from 'lucide-react';
 import { authFetch, getHomeRoute, getServerUserRole, logoutAndRedirect, requireAuthOrRedirect } from '@/lib/auth';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { ErrorScreen } from '@/components/ui/ErrorScreen';
@@ -180,14 +180,9 @@ export default function CoordinatorPage() {
               </p>
             </div>
 
-            <div className="inline-flex items-center gap-3 self-start rounded-2xl border border-white/80 bg-white/90 px-4 py-3 shadow-sm">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-100 to-pink-100">
-                <Star className="h-5 w-5 text-purple-700" />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500">תוכניות שמורות</p>
-                <p className="text-lg font-bold text-gray-900">{savedPrograms.length}</p>
-              </div>
+            <div className="min-w-[140px] rounded-3xl border border-purple-100 bg-gradient-to-br from-white to-purple-50 px-5 py-4 text-center shadow-[0_10px_30px_rgba(168,85,247,0.12)] ring-1 ring-white/70">
+              <p className="text-sm font-medium text-gray-500">תוכניות שמורות</p>
+              <p className="mt-2 text-4xl font-bold leading-none text-gray-800">{savedPrograms.length}</p>
             </div>
           </div>
         </div>
@@ -196,11 +191,8 @@ export default function CoordinatorPage() {
         {savedPrograms.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-200">
             <div className="max-w-md mx-auto">
-              <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="h-10 w-10 text-gray-400" />
-              </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">עדיין לא שמרת תוכניות</h3>
-              <p className="text-gray-500 mb-6">גלשי באלפון התוכניות ולחצי על ⭐ כדי לשמור תוכניות שמעניינות אותך</p>
+              <p className="text-gray-500 mb-6">גלשי באלפון התוכניות ולחצי על שמירה כדי לשמור תוכניות שמעניינות אותך</p>
               <Link
                 href="/programs"
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-md transition-all cursor-pointer"

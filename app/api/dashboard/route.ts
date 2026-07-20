@@ -5,6 +5,22 @@ import { requireRole } from '@/lib/api-auth';
 import { sendProgramPendingEmail } from '@/lib/email';
 import { stripProducerSecret, stripNestedProducerSecret } from '@/lib/sanitize';
 
+type PreviousApprovedData = {
+  title: string;
+  description: string;
+  category: string;
+  minAge: number;
+  maxAge: number;
+  duration: string;
+  location: string;
+  price: number | null;
+  audience: 'MEN' | 'WOMEN' | 'BOTH';
+  phone: string | null;
+  email: string | null;
+  images: string[];
+  videos: string[];
+};
+
 export async function GET(request: NextRequest) {
   // ניהול תוכניות פתוח למפיקות בלבד - רכזת לא יכולה לפרסם תוכניות
   const auth = requireRole(request, 'producer', 'admin');
@@ -148,6 +164,26 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'גיל מינימום לא יכול להיות גבוה מגיל מקסימום' }, { status: 400 });
     }
 
+    const shouldStorePreviousApprovedData = existingProgram.status === 'approved' && !existingProgram.previousApprovedData;
+
+    const previousApprovedData: PreviousApprovedData | null = shouldStorePreviousApprovedData
+      ? {
+          title: existingProgram.title,
+          description: existingProgram.description,
+          category: existingProgram.category,
+          minAge: existingProgram.minAge,
+          maxAge: existingProgram.maxAge,
+          duration: existingProgram.duration,
+          location: existingProgram.location,
+          price: existingProgram.price,
+          audience: existingProgram.audience,
+          phone: existingProgram.phone,
+          email: existingProgram.email,
+          images: existingProgram.images,
+          videos: existingProgram.videos,
+        }
+      : null;
+
     const program = await prisma.program.update({
       where: { id: programId },
       data: {
@@ -164,7 +200,8 @@ export async function PUT(request: NextRequest) {
         email: updateData.email || null,     // 👈 הוסף - אימייל ספציפי לתוכנית
         images: updateData.images || [],
         videos: updateData.videos || [],
-        status: 'pending'
+        status: 'pending',
+        ...(previousApprovedData ? { previousApprovedData } : {}),
       },
       include: { producer: true }
     });

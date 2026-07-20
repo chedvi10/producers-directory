@@ -77,12 +77,37 @@ export async function PUT(request: NextRequest) {
       });
     }
 
-    // עדכון סטטוס התוכנית
-    const program = await prisma.program.update({
+    const existingProgram = await prisma.program.findUnique({
       where: { id: programId },
-      data: { status },
-      include: { producer: true }
+      include: { producer: true },
     });
+
+    if (!existingProgram) {
+      return NextResponse.json({ error: 'Program not found' }, { status: 404 });
+    }
+
+    let program;
+    if (status === 'approved') {
+      // אישור: מפרסמים את הגרסה המעודכנת ומנקים snapshot קודם
+      program = await prisma.program.update({
+        where: { id: programId },
+        data: {
+          status: 'approved',
+          previousApprovedData: null,
+        },
+        include: { producer: true },
+      });
+    } else {
+      // דחייה: התוכנית לא מוצגת לציבור, ללא שחזור גרסה קודמת
+      program = await prisma.program.update({
+        where: { id: programId },
+        data: {
+          status: 'rejected',
+          previousApprovedData: null,
+        },
+        include: { producer: true },
+      });
+    }
 
     // שליחת מייל למפיקה לפי הסטטוס
     if (status === 'approved') {

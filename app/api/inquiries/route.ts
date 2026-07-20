@@ -1,4 +1,4 @@
-import { NextResponse, after } from 'next/server';
+import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
@@ -59,17 +59,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // שליחת המייל אחרי החזרת התשובה - לא מעכבים את הפונה על שרת ה-SMTP
+    // שליחת מייל למפיקה - מתבצע בסיום הבקשה כדי לוודא אמינות
     if (program.producer.email) {
-      after(() =>
-        sendNewInquiryEmail(
+      try {
+        await sendNewInquiryEmail(
           program.producer.email,
           program.producer.name,
           program.title,
           { name: inquiry.contactName, phone: inquiry.contactPhone, email: inquiry.contactEmail, institution: inquiry.contactInstitution },
           inquiry.message
-        )
-      );
+        );
+      } catch (emailError) {
+        // לא מפילים את יצירת הפנייה במקרה שכשלון מייל
+        console.error('Inquiry email send failed:', emailError);
+      }
     }
 
     return NextResponse.json({ success: true, inquiryId: inquiry.id });
