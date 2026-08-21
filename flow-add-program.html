@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>תרשים זרימה - הוספת תוכנית חדשה</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --text: #213347;
+      --muted: #5a6f88;
+      --blue: #2d78c8;
+      --blue-soft: #eaf3ff;
+      --orange: #f1a83c;
+      --orange-soft: #fff6e8;
+      --green: #3a9c5f;
+      --green-soft: #e9f8ef;
+      --red: #cc4a4a;
+      --red-soft: #fdeeee;
+      --line: #cbd9ea;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px 14px;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: linear-gradient(180deg, var(--bg) 0%, #eaf1fb 100%);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(18, 43, 79, 0.1);
+      padding: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      color: #1d446d;
+      font-size: 30px;
+    }
+
+    .sub {
+      text-align: center;
+      margin: 8px 0 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .note {
+      margin-top: 14px;
+      background: #f7fbff;
+      border: 1px solid #d6e6f8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #36506e;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>תרשים זרימה: הוספת תוכנית חדשה</h1>
+    <p class="sub">האישור של המנהלת נמצא לפני הפרסום, כשלב החלטה מחייב</p>
+
+    <svg viewBox="0 0 1080 760" xmlns="http://www.w3.org/2000/svg" aria-label="Flow diagram">
+      <defs>
+        <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+          <polygon points="0 0, 10 3, 0 6" fill="#2d78c8" />
+        </marker>
+        <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+          <polygon points="0 0, 10 3, 0 6" fill="#3a9c5f" />
+        </marker>
+        <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+          <polygon points="0 0, 10 3, 0 6" fill="#cc4a4a" />
+        </marker>
+      </defs>
+
+      <rect x="70" y="50" width="220" height="95" rx="12" fill="#eaf3ff" stroke="#2d78c8" stroke-width="2"/>
+      <text x="180" y="85" text-anchor="middle" font-size="20" font-weight="700" fill="#213347">1. מילוי טופס</text>
+      <text x="180" y="112" text-anchor="middle" font-size="14" fill="#526a84">Client + Zod</text>
+
+      <line x1="290" y1="98" x2="370" y2="98" stroke="#2d78c8" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+
+      <rect x="370" y="50" width="220" height="95" rx="12" fill="#eaf3ff" stroke="#2d78c8" stroke-width="2"/>
+      <text x="480" y="85" text-anchor="middle" font-size="20" font-weight="700" fill="#213347">2. קליטה בשרת</text>
+      <text x="480" y="112" text-anchor="middle" font-size="14" fill="#526a84">JWT + BLL + Prisma</text>
+
+      <line x1="590" y1="98" x2="670" y2="98" stroke="#2d78c8" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+
+      <rect x="670" y="50" width="220" height="95" rx="12" fill="#fff6e8" stroke="#f1a83c" stroke-width="2"/>
+      <text x="780" y="85" text-anchor="middle" font-size="20" font-weight="700" fill="#213347">3. שמירה</text>
+      <text x="780" y="112" text-anchor="middle" font-size="14" fill="#825a16">status: pending</text>
+
+      <line x1="780" y1="145" x2="780" y2="215" stroke="#2d78c8" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+
+      <polygon points="780,215 930,315 780,415 630,315" fill="#fff2db" stroke="#f1a83c" stroke-width="3"/>
+      <text x="780" y="298" text-anchor="middle" font-size="26" font-weight="800" fill="#7b5310">4. המנהלת מאשרת?</text>
+      <text x="780" y="330" text-anchor="middle" font-size="15" fill="#7b5310">שלב חובה לפני פרסום</text>
+
+      <line x1="930" y1="315" x2="1015" y2="315" stroke="#3a9c5f" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+      <text x="967" y="302" text-anchor="middle" font-size="14" font-weight="700" fill="#3a9c5f">כן</text>
+      <rect x="860" y="455" width="190" height="95" rx="12" fill="#e9f8ef" stroke="#3a9c5f" stroke-width="2.5"/>
+      <text x="955" y="490" text-anchor="middle" font-size="22" font-weight="800" fill="#246a3f">5א. אישור</text>
+      <text x="955" y="517" text-anchor="middle" font-size="14" fill="#2e7c49">approved -> מתפרסם</text>
+
+      <line x1="955" y1="455" x2="955" y2="375" stroke="#3a9c5f" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+
+      <line x1="630" y1="315" x2="545" y2="315" stroke="#cc4a4a" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+      <text x="592" y="302" text-anchor="middle" font-size="14" font-weight="700" fill="#cc4a4a">לא</text>
+      <rect x="330" y="455" width="210" height="95" rx="12" fill="#fdeeee" stroke="#cc4a4a" stroke-width="2.5"/>
+      <text x="435" y="490" text-anchor="middle" font-size="22" font-weight="800" fill="#963232">5ב. דחייה</text>
+      <text x="435" y="517" text-anchor="middle" font-size="14" fill="#963232">rejected -> לא מתפרסם</text>
+
+      <line x1="435" y1="455" x2="435" y2="375" stroke="#cc4a4a" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+
+      <rect x="440" y="620" width="400" height="95" rx="12" fill="#eaf3ff" stroke="#2d78c8" stroke-width="2"/>
+      <text x="640" y="655" text-anchor="middle" font-size="22" font-weight="800" fill="#1d446d">6. תשובה ל-Client + עדכון UI</text>
+      <text x="640" y="682" text-anchor="middle" font-size="14" fill="#526a84">הודעה מתאימה לפי סטטוס אישור/דחייה</text>
+
+      <line x1="955" y1="550" x2="760" y2="620" stroke="#3a9c5f" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+      <line x1="435" y1="550" x2="525" y2="620" stroke="#cc4a4a" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+    </svg>
+
+    <div class="note">מיקום האישור ברור: קודם pending, אחר כך החלטת מנהלת, ורק אז פרסום או אי-פרסום.</div>
+  </div>
+</body>
+</html>

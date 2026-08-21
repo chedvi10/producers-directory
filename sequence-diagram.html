@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>תרשים רצף - הוספת תוכנית חדשה</title>
+  <style>
+    :root {
+      --bg: #f4f7fc;
+      --card: #ffffff;
+      --ink: #20354f;
+      --muted: #5f738d;
+      --line: #5f8fc8;
+      --line-soft: #8fb2dd;
+      --blue-bg: #e8f1fc;
+      --blue-br: #5f9be0;
+      --violet-bg: #efeafd;
+      --violet-br: #8a78dd;
+      --orange-bg: #fff1e2;
+      --orange-br: #f0a24f;
+      --green-bg: #eaf8ef;
+      --green-br: #55b17e;
+      --teal-bg: #e9f7fa;
+      --teal-br: #5bb6cc;
+      --pink-bg: #fdf0f5;
+      --pink-br: #e587aa;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 22px 14px;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: linear-gradient(180deg, var(--bg), #e9f1fb);
+      color: var(--ink);
+    }
+
+    .container {
+      max-width: 1650px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(17, 39, 66, 0.1);
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: 34px;
+      color: #1f4a75;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin: 8px 0 16px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid #d8e4f2;
+      border-radius: 12px;
+      background: #fcfeff;
+    }
+
+    .caption {
+      margin-top: 12px;
+      background: #f7fbff;
+      border: 1px solid #d5e3f4;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #3f5b7a;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>תרשים רצף: הוספת תוכנית חדשה</h1>
+    <p class="subtitle">סגנון נקי וברור להצעת פרויקט, עם שלב אישור מנהלת לפני פרסום</p>
+
+    <svg viewBox="0 0 1680 920" xmlns="http://www.w3.org/2000/svg" aria-label="Sequence Diagram">
+      <defs>
+        <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+          <polygon points="0 0, 10 4, 0 8" fill="#5f8fc8" />
+        </marker>
+      </defs>
+
+      <!-- lane labels -->
+      <text x="1450" y="65" text-anchor="middle" font-size="22" font-weight="700" fill="#6d8098">צד לקוח</text>
+      <text x="1150" y="65" text-anchor="middle" font-size="22" font-weight="700" fill="#6d8098">בדיקות לקוח</text>
+      <text x="850" y="65" text-anchor="middle" font-size="22" font-weight="700" fill="#6d8098">שרת</text>
+      <text x="550" y="65" text-anchor="middle" font-size="22" font-weight="700" fill="#6d8098">לוגיקה עסקית</text>
+      <text x="250" y="65" text-anchor="middle" font-size="22" font-weight="700" fill="#6d8098">מסד נתונים</text>
+
+      <!-- top row boxes -->
+      <rect x="1320" y="100" width="260" height="120" rx="22" fill="var(--blue-bg)" stroke="var(--blue-br)" stroke-width="3"/>
+      <text x="1450" y="145" text-anchor="middle" font-size="32" font-weight="700" fill="#244569">Client</text>
+      <text x="1450" y="185" text-anchor="middle" font-size="24" fill="#385c82">מילוי טופס</text>
+
+      <rect x="1020" y="100" width="260" height="120" rx="22" fill="var(--violet-bg)" stroke="var(--violet-br)" stroke-width="3"/>
+      <text x="1150" y="145" text-anchor="middle" font-size="32" font-weight="700" fill="#3f3878">ולידציה</text>
+      <text x="1150" y="185" text-anchor="middle" font-size="24" fill="#5f5a95">Zod</text>
+
+      <rect x="720" y="100" width="260" height="120" rx="22" fill="var(--orange-bg)" stroke="var(--orange-br)" stroke-width="3"/>
+      <text x="850" y="145" text-anchor="middle" font-size="30" font-weight="700" fill="#6b4921">API + Middleware</text>
+      <text x="850" y="185" text-anchor="middle" font-size="22" fill="#7f5930">אימות והרשאות</text>
+
+      <rect x="420" y="100" width="260" height="120" rx="22" fill="var(--green-bg)" stroke="var(--green-br)" stroke-width="3"/>
+      <text x="550" y="145" text-anchor="middle" font-size="32" font-weight="700" fill="#2d6346">BLL</text>
+      <text x="550" y="185" text-anchor="middle" font-size="22" fill="#3f7d5c">לוגיקה עסקית</text>
+
+      <rect x="120" y="100" width="260" height="120" rx="22" fill="var(--pink-bg)" stroke="var(--pink-br)" stroke-width="3"/>
+      <text x="250" y="145" text-anchor="middle" font-size="32" font-weight="700" fill="#8b3753">MongoDB</text>
+      <text x="250" y="185" text-anchor="middle" font-size="22" fill="#9a4762">status: pending</text>
+
+      <!-- top arrows and numbers -->
+      <line x1="1320" y1="160" x2="1280" y2="160" stroke="var(--line)" stroke-width="3" marker-end="url(#arrowBlue)"/>
+      <circle cx="1298" cy="132" r="18" fill="#fff" stroke="var(--line-soft)" stroke-width="2"/>
+      <text x="1298" y="139" text-anchor="middle" font-size="16" font-weight="700" fill="#4d719a">1</text>
+
+      <line x1="1020" y1="160" x2="980" y2="160" stroke="var(--line)" stroke-width="3" marker-end="url(#arrowBlue)"/>
+      <circle cx="998" cy="132" r="18" fill="#fff" stroke="var(--line-soft)" stroke-width="2"/>
+      <text x="998" y="139" text-anchor="middle" font-size="16" font-weight="700" fill="#4d719a">2</text>
+
+      <line x1="720" y1="160" x2="680" y2="160" stroke="var(--line)" stroke-width="3" marker-end="url(#arrowBlue)"/>
+      <circle cx="698" cy="132" r="18" fill="#fff" stroke="var(--line-soft)" stroke-width="2"/>
+      <text x="698" y="139" text-anchor="middle" font-size="16" font-weight="700" fill="#4d719a">3</text>
+
+      <line x1="420" y1="160" x2="380" y2="160" stroke="var(--line)" stroke-width="3" marker-end="url(#arrowBlue)"/>
+      <circle cx="398" cy="132" r="18" fill="#fff" stroke="var(--line-soft)" stroke-width="2"/>
+      <text x="398" y="139" text-anchor="middle" font-size="16" font-weight="700" fill="#4d719a">4</text>
+
+      <line x1="120" y1="160" x2="80" y2="160" stroke="var(--line)" stroke-width="3" marker-end="url(#arrowBlue)"/>
+      <circle cx="98" cy="132" r="18" fill="#fff" stroke="var(--line-soft)" stroke-width="2"/>
+      <text x="98" y="139" text-anchor="middle" font-size="16" font-weight="700" fill="#4d719a">5</text>
+
+      <!-- flow labels under top arrows -->
+      <text x="1450" y="255" text-anchor="middle" font-size="18" font-weight="700" fill="#496789">מילוי טופס</text>
+      <text x="1150" y="255" text-anchor="middle" font-size="18" font-weight="700" fill="#496789">ולידציה מקומית</text>
+      <text x="850" y="255" text-anchor="middle" font-size="18" font-weight="700" fill="#496789">בקשת API</text>
+      <text x="550" y="255" text-anchor="middle" font-size="18" font-weight="700" fill="#496789">מעבר BLL</text>
+      <text x="250" y="255" text-anchor="middle" font-size="18" font-weight="700" fill="#496789">INSERT</text>
+
+      <!-- down from db to response -->
+      <line x1="250" y1="220" x2="250" y2="360" stroke="var(--line)" stroke-width="3"/>
+      <line x1="250" y1="360" x2="780" y2="360" stroke="var(--line)" stroke-width="3"/>
+      <line x1="780" y1="360" x2="780" y2="470" stroke="var(--line)" stroke-width="3" marker-end="url(#arrowBlue)"/>
+      <circle cx="285" cy="335" r="18" fill="#fff" stroke="var(--line-soft)" stroke-width="2"/>
+      <text x="285" y="342" text-anchor="middle" font-size="16" font-weight="700" fill="#4d719a">6</text>
+      <text x="560" y="385" text-anchor="middle" font-size="18" font-weight="700" fill="#496789">תוצאת שמירה חוזרת מהשרת</text>
+
+      <!-- response and ui boxes -->
+      <rect x="780" y="470" width="360" height="130" rx="22" fill="var(--blue-bg)" stroke="var(--blue-br)" stroke-width="3"/>
+      <text x="960" y="515" text-anchor="middle" font-size="32" font-weight="700" fill="#234a73">תשובה ל-Client</text>
+      <text x="960" y="555" text-anchor="middle" font-size="22" fill="#385c82">200 / 4xx / 5xx + JSON</text>
+
+      <line x1="780" y1="535" x2="680" y2="535" stroke="var(--line)" stroke-width="3" marker-end="url(#arrowBlue)"/>
+      <circle cx="705" cy="505" r="18" fill="#fff" stroke="var(--line-soft)" stroke-width="2"/>
+      <text x="705" y="512" text-anchor="middle" font-size="16" font-weight="700" fill="#4d719a">7</text>
+
+      <rect x="420" y="470" width="260" height="130" rx="22" fill="var(--blue-bg)" stroke="var(--blue-br)" stroke-width="3"/>
+      <text x="550" y="515" text-anchor="middle" font-size="32" font-weight="700" fill="#234a73">עדכון UI</text>
+      <text x="550" y="555" text-anchor="middle" font-size="22" fill="#385c82">Toast + שינוי סטטוס</text>
+
+      <!-- dashed back to client -->
+      <line x1="680" y1="535" x2="680" y2="360" stroke="var(--line)" stroke-width="3" stroke-dasharray="10 8"/>
+      <line x1="680" y1="360" x2="1450" y2="360" stroke="var(--line)" stroke-width="3" stroke-dasharray="10 8"/>
+      <line x1="1450" y1="360" x2="1450" y2="220" stroke="var(--line)" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#arrowBlue)"/>
+      <circle cx="625" cy="387" r="18" fill="#fff" stroke="var(--line-soft)" stroke-width="2"/>
+      <text x="625" y="394" text-anchor="middle" font-size="16" font-weight="700" fill="#4d719a">8</text>
+      <text x="1060" y="385" text-anchor="middle" font-size="18" font-weight="700" fill="#496789">רענון UI ומצב הצלחה</text>
+
+      <!-- admin approval section -->
+      <line x1="250" y1="220" x2="250" y2="670" stroke="var(--line)" stroke-width="3"/>
+      <line x1="250" y1="670" x2="780" y2="670" stroke="var(--line)" stroke-width="3"/>
+      <line x1="780" y1="670" x2="780" y2="760" stroke="var(--line)" stroke-width="3" marker-end="url(#arrowBlue)"/>
+      <circle cx="285" cy="645" r="18" fill="#fff" stroke="var(--line-soft)" stroke-width="2"/>
+      <text x="285" y="652" text-anchor="middle" font-size="16" font-weight="700" fill="#4d719a">9</text>
+      <text x="565" y="695" text-anchor="middle" font-size="18" font-weight="700" fill="#496789">התוכנית ממתינה לאישור מנהלת</text>
+
+      <rect x="780" y="700" width="360" height="130" rx="22" fill="#fff1e2" stroke="#f0a24f" stroke-width="3"/>
+      <text x="960" y="748" text-anchor="middle" font-size="30" font-weight="700" fill="#6b4921">אישור מנהלת</text>
+      <text x="960" y="785" text-anchor="middle" font-size="22" fill="#7f5930">אישור / דחייה</text>
+
+      <line x1="780" y1="765" x2="680" y2="765" stroke="#55b17e" stroke-width="3" marker-end="url(#arrowBlue)"/>
+      <rect x="420" y="700" width="260" height="55" rx="18" fill="#eaf8ef" stroke="#55b17e" stroke-width="3"/>
+      <text x="550" y="728" text-anchor="middle" font-size="22" font-weight="700" fill="#2d6346">אישור</text>
+      <text x="550" y="748" text-anchor="middle" font-size="16" fill="#3f7d5c">פרסום באלפון</text>
+
+      <line x1="780" y1="805" x2="680" y2="805" stroke="#e587aa" stroke-width="3" marker-end="url(#arrowBlue)"/>
+      <rect x="420" y="775" width="260" height="55" rx="18" fill="#fdf0f5" stroke="#e587aa" stroke-width="3"/>
+      <text x="550" y="803" text-anchor="middle" font-size="22" font-weight="700" fill="#8b3753">דחייה</text>
+      <text x="550" y="823" text-anchor="middle" font-size="16" fill="#9a4762">לא מתפרסם</text>
+    </svg>
+
+    <div class="caption">תרשים בסגנון נקי: Client -> ולידציה -> API + Middleware -> BLL -> MongoDB -> תשובה -> עדכון UI, ולאחר מכן החלטת מנהלת: אישור או דחייה.</div>
+  </div>
+</body>
+</html>

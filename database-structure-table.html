@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מבנה נתונים - Producers Directory</title>
+  <style>
+    :root {
+      --bg: #f9f2f7;
+      --card: #ffffff;
+      --text: #2b1c2d;
+      --muted: #6f5870;
+      --line: #eddae9;
+      --head: #4c2a45;
+      --accent: #c8569b;
+      --soft: #f7e8f3;
+      --soft-strong: #e9c9df;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: radial-gradient(circle at top, #fff9fc 0%, var(--bg) 52%, #f5edf4 100%);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1480px;
+      margin: 32px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 28px rgba(162, 97, 138, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      color: var(--head);
+      font-size: 28px;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(200, 86, 155, 0.13);
+      color: #9b3d7d;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+
+    .erd-scroll {
+      overflow-x: auto;
+      overflow-y: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .erd-board {
+      position: relative;
+      width: 1400px;
+      min-height: 1880px;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+      overflow: hidden;
+    }
+
+    .entity-card {
+      position: absolute;
+      width: 330px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.07);
+      z-index: 2;
+    }
+
+    .producer { left: 24px; top: 24px; }
+    .program { left: 420px; top: 24px; width: 380px; }
+    .subscription { left: 24px; top: 520px; }
+    .saved { left: 420px; top: 980px; }
+    .inquiry { left: 900px; top: 520px; }
+
+    .entity-header {
+      background: linear-gradient(180deg, #f9eaf4 0%, #f4dfe9 100%);
+      color: #5a3151;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-bottom: 1px solid #e7cce0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .entity-note {
+      font-size: 12px;
+      color: #475569;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #fcfdff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: #fdf3f9;
+      color: #4d2b43;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px;
+      text-align: right;
+    }
+
+    tbody td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .k {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      border: 1px solid var(--line);
+      color: #374151;
+      background: #f9fafb;
+    }
+
+    .field {
+      font-family: Consolas, "Courier New", monospace;
+      color: #0f172a;
+      font-size: 12px;
+    }
+
+    .type {
+      color: #334155;
+      font-size: 12px;
+    }
+
+    .relations {
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .relations h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      color: var(--head);
+    }
+
+    .relations ul {
+      margin: 0;
+      padding-right: 18px;
+    }
+
+    .relations li {
+      margin: 6px 0;
+    }
+
+    .relations-table {
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .relations-table h3 {
+      margin: 0;
+      padding: 10px 12px;
+      background: #fdf2f8;
+      border-bottom: 1px solid var(--line);
+      font-size: 16px;
+      color: #0f172a;
+    }
+
+    @media (max-width: 900px) {
+      .erd-board {
+        width: auto;
+        min-height: auto;
+        padding: 12px;
+      }
+
+      .entity-card {
+        position: static;
+        width: auto;
+        margin-bottom: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>מבנה נתונים (ERD) - טבלאות וקשרים</h1>
+      <p class="subtitle">
+        פרויקט Producers Directory
+        <span class="tag">MongoDB + Prisma</span>
+        <span class="tag">ERD בסגנון טבלאות מקושרות</span>
+      </p>
+
+      <div class="erd-scroll">
+      <div class="erd-board">
+        <section class="entity-card producer">
+          <div class="entity-header"><span>Producer</span><span class="k">טבלת משתמשים</span></div>
+          <div class="entity-note">תפקידי מערכת: מפיקה / רכזת / מנהלת</div>
+          <table>
+              <thead><tr><th>שדה</th><th>סוג</th><th>מפתח</th></tr></thead>
+              <tbody>
+                <tr><td class="field">id</td><td class="type">ObjectId</td><td><span class="k">PK</span></td></tr>
+                <tr><td class="field">name</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">email</td><td class="type">String</td><td><span class="k">Unique</span></td></tr>
+                <tr><td class="field">phone</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">institution</td><td class="type">String?</td><td></td></tr>
+                <tr><td class="field">passwordHash</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">role</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">createdAt</td><td class="type">DateTime</td><td></td></tr>
+              </tbody>
+            </table>
+        </section>
+
+        <section class="entity-card program">
+          <div class="entity-header"><span>Program</span><span class="k">טבלת תוכניות</span></div>
+          <div class="entity-note">כוללת תוכן, מדיה, סטטוס, צפיות וקישור למפיקה</div>
+          <table>
+              <thead><tr><th>שדה</th><th>סוג</th><th>מפתח</th></tr></thead>
+              <tbody>
+                <tr><td class="field">id</td><td class="type">ObjectId</td><td><span class="k">PK</span></td></tr>
+                <tr><td class="field">title</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">description</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">category</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">minAge</td><td class="type">Int</td><td></td></tr>
+                <tr><td class="field">maxAge</td><td class="type">Int</td><td></td></tr>
+                <tr><td class="field">audience</td><td class="type">Enum</td><td></td></tr>
+                <tr><td class="field">duration</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">location</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">price</td><td class="type">Float?</td><td></td></tr>
+                <tr><td class="field">phone</td><td class="type">String?</td><td></td></tr>
+                <tr><td class="field">email</td><td class="type">String?</td><td></td></tr>
+                <tr><td class="field">tags</td><td class="type">String[]</td><td></td></tr>
+                <tr><td class="field">images</td><td class="type">String[]</td><td></td></tr>
+                <tr><td class="field">videos</td><td class="type">String[]</td><td></td></tr>
+                <tr><td class="field">status</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">views</td><td class="type">Int</td><td></td></tr>
+                <tr><td class="field">producerId</td><td class="type">ObjectId</td><td><span class="k">FK</span></td></tr>
+                <tr><td class="field">createdAt</td><td class="type">DateTime</td><td></td></tr>
+                <tr><td class="field">updatedAt</td><td class="type">DateTime</td><td></td></tr>
+              </tbody>
+            </table>
+        </section>
+
+        <section class="entity-card subscription">
+          <div class="entity-header"><span>Subscription</span><span class="k">טבלת מנויים</span></div>
+          <div class="entity-note">מנוי אחד לכל מפיקה</div>
+          <table>
+              <thead><tr><th>שדה</th><th>סוג</th><th>מפתח</th></tr></thead>
+              <tbody>
+                <tr><td class="field">id</td><td class="type">ObjectId</td><td><span class="k">PK</span></td></tr>
+                <tr><td class="field">producerId</td><td class="type">ObjectId</td><td><span class="k">FK + Unique</span></td></tr>
+                <tr><td class="field">startDate</td><td class="type">DateTime</td><td></td></tr>
+                <tr><td class="field">expiryDate</td><td class="type">DateTime</td><td></td></tr>
+                <tr><td class="field">status</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">reminderSent</td><td class="type">Boolean</td><td></td></tr>
+              </tbody>
+            </table>
+        </section>
+
+        <section class="entity-card saved">
+          <div class="entity-header"><span>SavedProgram</span><span class="k">תוכניות שמורות</span></div>
+          <div class="entity-note">טבלת קישור בין רכזת לתוכנית + מידע אישי</div>
+          <table>
+              <thead><tr><th>שדה</th><th>סוג</th><th>מפתח</th></tr></thead>
+              <tbody>
+                <tr><td class="field">id</td><td class="type">ObjectId</td><td><span class="k">PK</span></td></tr>
+                <tr><td class="field">coordinatorId</td><td class="type">ObjectId</td><td><span class="k">FK</span></td></tr>
+                <tr><td class="field">programId</td><td class="type">ObjectId</td><td><span class="k">FK</span></td></tr>
+                <tr><td class="field">note</td><td class="type">String?</td><td></td></tr>
+                <tr><td class="field">trackStatus</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">createdAt</td><td class="type">DateTime</td><td></td></tr>
+                <tr><td class="field">updatedAt</td><td class="type">DateTime</td><td></td></tr>
+              </tbody>
+            </table>
+        </section>
+
+        <section class="entity-card inquiry">
+          <div class="entity-header"><span>Inquiry</span><span class="k">טבלת פניות</span></div>
+          <div class="entity-note">פנייה למפיקה בנוגע לתוכנית, כולל פרטי קשר</div>
+          <table>
+              <thead><tr><th>שדה</th><th>סוג</th><th>מפתח</th></tr></thead>
+              <tbody>
+                <tr><td class="field">id</td><td class="type">ObjectId</td><td><span class="k">PK</span></td></tr>
+                <tr><td class="field">message</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">status</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">contactName</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">contactPhone</td><td class="type">String</td><td></td></tr>
+                <tr><td class="field">contactEmail</td><td class="type">String?</td><td></td></tr>
+                <tr><td class="field">contactInstitution</td><td class="type">String?</td><td></td></tr>
+                <tr><td class="field">coordinatorId</td><td class="type">ObjectId?</td><td><span class="k">FK</span></td></tr>
+                <tr><td class="field">programId</td><td class="type">ObjectId</td><td><span class="k">FK</span></td></tr>
+                <tr><td class="field">producerId</td><td class="type">ObjectId</td><td><span class="k">FK</span></td></tr>
+                <tr><td class="field">createdAt</td><td class="type">DateTime</td><td></td></tr>
+              </tbody>
+            </table>
+        </section>
+      </div>
+      </div>
+
+      <div class="relations-table">
+        <h3>טבלת קשרים מסודרת בין הטבלאות</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>טבלת מקור (Parent)</th>
+              <th>שדה מקור (PK)</th>
+              <th>טבלת יעד (Child)</th>
+              <th>שדה יעד (FK)</th>
+              <th>סוג קשר</th>
+              <th>הסבר קצר</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Producer</td><td>id</td><td>Program</td><td>producerId</td><td>0..N</td><td>למפיקה אחת יכולות להיות אפס או יותר תוכניות</td></tr>
+            <tr><td>Producer</td><td>id</td><td>Subscription</td><td>producerId</td><td>1:1</td><td>לכל מפיקה מנוי יחיד</td></tr>
+            <tr><td>Producer</td><td>id</td><td>SavedProgram</td><td>coordinatorId</td><td>0..N</td><td>רכזת יכולה לשמור אפס או יותר תוכניות</td></tr>
+            <tr><td>Program</td><td>id</td><td>SavedProgram</td><td>programId</td><td>0..N</td><td>תוכנית יכולה להישמר ע"י אפס או יותר רכזות</td></tr>
+            <tr><td>Program</td><td>id</td><td>Inquiry</td><td>programId</td><td>0..N</td><td>לתוכנית יכולות להיות אפס או יותר פניות</td></tr>
+            <tr><td>Producer</td><td>id</td><td>Inquiry</td><td>producerId</td><td>0..N</td><td>מפיקה יכולה לקבל אפס או יותר פניות</td></tr>
+            <tr><td>Producer</td><td>id</td><td>Inquiry</td><td>coordinatorId</td><td>0..N (FK אופציונלי)</td><td>בפנייה אנונימית השדה coordinatorId ריק (null); בפנייה של רכזת מחוברת הוא נשמר</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:10px 12px;border-top:1px solid #e5e7eb;background:#fcfdff;color:#475569;font-size:12px;">
+          הערה מקצועית: הסימון מוצג מנקודת מבט הישות ההורית (Parent). לדוגמה, 0..N מציין שרשומת מקור אחת יכולה להיות מקושרת לאפס או יותר רשומות יעד.
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -88,7 +88,7 @@ function RegisterForm() {
           </Link>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">הרשמה למדריך התוכניות</h1>
           <p className="text-gray-600">
-            {role === 'producer' ? 'הצטרפי לקהילת המפיקות המובילות' : 'שמרי תוכניות, נהלי הערות ותכנני אירועים'}
+            {role === 'producer' ? 'הצטרפי לקהילת המפיקות המובילות' : 'הצטרפי לפלטפורמה החדשנית לתכנון ארועים'}
           </p>
         </div>
 

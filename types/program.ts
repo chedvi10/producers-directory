@@ -9,17 +9,17 @@ export interface Program {
   location: string;
   price: number | null;
   audience?: 'MEN' | 'WOMEN' | 'BOTH';
-  phone?: string;  // 👈 הוסף - טלפון ספציפי לתוכנית
-  email?: string;  // 👈 הוסף - אימייל ספציפי לתוכנית
+  phone?: string;  
+  email?: string;  
   tags?: string[];
   images?: string[];
   videos?: string[];
   createdAt?: string;
-  status?: string;  // 👈 הוסף - סטטוס התוכנית
+  status?: string;  
   producer: {
     name: string;
     phone: string;
-    email?: string;  // 👈 הוסף - אימייל של המפיקה
+    email?: string; 
   };
 }
 

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>ERD – מדריך תוכניות</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 32px;
+      background: linear-gradient(180deg, #eef4f8 0%, #dde8f0 100%);
+      font-family: "Segoe UI", Arial, sans-serif;
+      direction: ltr;
+    }
+    h1 {
+      text-align: center;
+      font-size: 22px;
+      color: #1e3a5f;
+      margin-bottom: 6px;
+      direction: rtl;
+    }
+    .sub {
+      text-align: center;
+      font-size: 13px;
+      color: #607080;
+      margin-bottom: 24px;
+      direction: rtl;
+    }
+    .canvas {
+      position: relative;
+      width: 1400px;
+      height: 1120px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbfd 100%);
+      border: 1px solid #d1deea;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(34, 62, 90, 0.12);
+    }
+    svg.lines {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .table-box {
+      position: absolute;
+      width: 240px;
+      border: 1px solid #c9d8e6;
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 10px 24px rgba(44, 76, 104, 0.12);
+    }
+    .table-header {
+      background: linear-gradient(135deg, #2b5f8e 0%, #4276a6 100%);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 12px;
+      text-align: center;
+      letter-spacing: 0.4px;
+    }
+    .table-row {
+      display: flex;
+      align-items: center;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-bottom: 1px solid #e8eef4;
+      color: #1e2d3d;
+      gap: 8px;
+    }
+    .table-row:last-child { border-bottom: none; }
+    .table-row.pk { background: #eef5ff; font-weight: 600; }
+    .table-row.fk { background: #fff8f0; }
+    .table-row:not(.pk):not(.fk):nth-child(odd) { background: #fbfdff; }
+    .badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 999px;
+      min-width: 22px;
+      text-align: center;
+    }
+    .badge.pk { background: #f0c040; color: #5a3a00; }
+    .badge.fk { background: #f08060; color: #fff; }
+    .field-name { flex: 1; }
+    .field-type {
+      color: #59718b;
+      font-size: 10.5px;
+      background: #f1f6fa;
+      border-radius: 999px;
+      padding: 2px 7px;
+      white-space: nowrap;
+    }
+    .group-label {
+      position: absolute;
+      font-size: 13px;
+      font-weight: 700;
+      color: #54708d;
+      background: #edf4fa;
+      border: 1px solid #d5e2ee;
+      border-radius: 999px;
+      padding: 6px 12px;
+      direction: rtl;
+    }
+    .legend-line {
+      display: inline-block;
+      width: 24px;
+      height: 2px;
+      background: #5a82a8;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    .legend-line.dashed {
+      background: none;
+      border-top: 2px dashed #a05020;
+      height: 0;
+    }
+  </style>
+</head>
+<body>
+<h1>תרשים ישויות-קשרים (ERD) — מדריך תוכניות</h1>
+<p class="sub">בסיס נתונים: MongoDB | ניהול סכמה: Prisma ORM</p>
+
+<div class="canvas">
+  <div class="group-label" style="left:70px; top:28px;">ישויות ליבה</div>
+  <div class="group-label" style="left:70px; top:635px;">ישויות תפעול וקשר</div>
+
+  <svg class="lines">
+    <!-- Producer → Program (1:N) -->
+    <line x1="310" y1="185" x2="560" y2="185" stroke="#5a82a8" stroke-width="1.8"/>
+    <circle cx="310" cy="185" r="4" fill="#5a82a8"/>
+    <text x="420" y="172" font-size="11" fill="#2b5f8e" font-family="Segoe UI">1 : N</text>
+
+    <!-- Producer → Subscription (1:1) -->
+    <line x1="190" y1="325" x2="190" y2="690" stroke="#5a82a8" stroke-width="1.8"/>
+    <circle cx="190" cy="325" r="4" fill="#5a82a8"/>
+    <text x="198" y="520" font-size="11" fill="#2b5f8e" font-family="Segoe UI">1 : 1</text>
+
+    <!-- Producer(coord) → SavedProgram (1:N) -->
+    <line x1="310" y1="260" x2="560" y2="735" stroke="#d08050" stroke-width="1.8" stroke-dasharray="5,3"/>
+    <circle cx="310" cy="260" r="4" fill="#d08050"/>
+    <text x="360" y="515" font-size="11" fill="#a05020" font-family="Segoe UI">1 : N</text>
+
+    <!-- Program → SavedProgram (1:N) -->
+    <line x1="680" y1="575" x2="680" y2="735" stroke="#d08050" stroke-width="1.8" stroke-dasharray="5,3"/>
+    <circle cx="680" cy="575" r="4" fill="#d08050"/>
+    <text x="689" y="662" font-size="11" fill="#a05020" font-family="Segoe UI">N : 1</text>
+
+    <!-- Producer(coord) → Inquiry (1:N) -->
+    <line x1="310" y1="282" x2="1050" y2="700" stroke="#8050d0" stroke-width="1.8" stroke-dasharray="5,3"/>
+    <circle cx="310" cy="282" r="4" fill="#8050d0"/>
+    <text x="635" y="545" font-size="11" fill="#6030a0" font-family="Segoe UI">1 : N</text>
+
+    <!-- Program → Inquiry (1:N) -->
+    <line x1="800" y1="395" x2="1050" y2="700" stroke="#8050d0" stroke-width="1.8" stroke-dasharray="5,3"/>
+    <circle cx="800" cy="395" r="4" fill="#8050d0"/>
+    <text x="895" y="560" font-size="11" fill="#6030a0" font-family="Segoe UI">1 : N</text>
+  </svg>
+
+  <!-- Producer — 8 שדות + header -->
+  <div class="table-box" style="left:70px; top:100px;">
+    <div class="table-header">Producer</div>
+    <div class="table-row pk"><span class="badge pk">PK</span><span class="field-name">id</span><span class="field-type">ObjectId</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">name</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">email</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">phone</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">institution</span><span class="field-type">String?</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">passwordHash</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">role</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">createdAt</span><span class="field-type">DateTime</span></div>
+  </div>
+
+  <!-- Program — 20 שדות + header -->
+  <div class="table-box" style="left:560px; top:80px;">
+    <div class="table-header">Program</div>
+    <div class="table-row pk"><span class="badge pk">PK</span><span class="field-name">id</span><span class="field-type">ObjectId</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">title</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">description</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">category</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">minAge</span><span class="field-type">Int</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">maxAge</span><span class="field-type">Int</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">audience</span><span class="field-type">Enum</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">duration</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">location</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">price</span><span class="field-type">Float?</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">phone</span><span class="field-type">String?</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">email</span><span class="field-type">String?</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">tags</span><span class="field-type">String[]</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">images</span><span class="field-type">String[]</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">videos</span><span class="field-type">String[]</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">status</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">views</span><span class="field-type">Int</span></div>
+    <div class="table-row fk"><span class="badge fk">FK</span><span class="field-name">producerId</span><span class="field-type">ObjectId</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">createdAt</span><span class="field-type">DateTime</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">updatedAt</span><span class="field-type">DateTime</span></div>
+  </div>
+
+  <!-- Subscription — 6 שדות + header -->
+  <div class="table-box" style="left:70px; top:690px;">
+    <div class="table-header">Subscription</div>
+    <div class="table-row pk"><span class="badge pk">PK</span><span class="field-name">id</span><span class="field-type">ObjectId</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">startDate</span><span class="field-type">DateTime</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">expiryDate</span><span class="field-type">DateTime</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">status</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">reminderSent</span><span class="field-type">Boolean</span></div>
+    <div class="table-row fk"><span class="badge fk">FK</span><span class="field-name">producerId</span><span class="field-type">ObjectId</span></div>
+  </div>
+
+  <!-- SavedProgram — 7 שדות + header -->
+  <div class="table-box" style="left:560px; top:735px;">
+    <div class="table-header">SavedProgram</div>
+    <div class="table-row pk"><span class="badge pk">PK</span><span class="field-name">id</span><span class="field-type">ObjectId</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">note</span><span class="field-type">String?</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">trackStatus</span><span class="field-type">String</span></div>
+    <div class="table-row fk"><span class="badge fk">FK</span><span class="field-name">coordinatorId</span><span class="field-type">ObjectId</span></div>
+    <div class="table-row fk"><span class="badge fk">FK</span><span class="field-name">programId</span><span class="field-type">ObjectId</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">createdAt</span><span class="field-type">DateTime</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">updatedAt</span><span class="field-type">DateTime</span></div>
+  </div>
+
+  <!-- Inquiry — 11 שדות + header -->
+  <div class="table-box" style="left:1050px; top:700px;">
+    <div class="table-header">Inquiry</div>
+    <div class="table-row pk"><span class="badge pk">PK</span><span class="field-name">id</span><span class="field-type">ObjectId</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">message</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">status</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">contactName</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">contactPhone</span><span class="field-type">String</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">contactEmail</span><span class="field-type">String?</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">contactInstitution</span><span class="field-type">String?</span></div>
+    <div class="table-row fk"><span class="badge fk">FK</span><span class="field-name">coordinatorId</span><span class="field-type">ObjectId?</span></div>
+    <div class="table-row fk"><span class="badge fk">FK</span><span class="field-name">programId</span><span class="field-type">ObjectId</span></div>
+    <div class="table-row fk"><span class="badge fk">FK</span><span class="field-name">producerId</span><span class="field-type">ObjectId</span></div>
+    <div class="table-row"><span class="badge" style="visibility:hidden">--</span><span class="field-name">createdAt</span><span class="field-type">DateTime</span></div>
+  </div>
+
+  <!-- Legend -->
+  <div style="position:absolute; bottom:18px; left:18px; font-size:11px; color:#444; display:flex; gap:18px; align-items:center; background:rgba(255,255,255,0.9); border:1px solid #d6e2ec; border-radius:999px; padding:10px 14px;">
+    <span><span style="background:#f0c040;color:#5a3a00;font-weight:700;padding:1px 5px;border-radius:3px;font-size:10px;">PK</span> מפתח ראשי</span>
+    <span><span style="background:#f08060;color:#fff;font-weight:700;padding:1px 5px;border-radius:3px;font-size:10px;">FK</span> מפתח זר</span>
+    <span><span class="legend-line"></span> קשר רגיל</span>
+    <span><span class="legend-line dashed"></span> קשר דרך טבלת קשר</span>
+  </div>
+</div>
+</body>
+</html>
